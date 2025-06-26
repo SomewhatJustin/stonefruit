@@ -9,7 +9,7 @@ A **self-host-able, TypeScript-only Slack alternative** you can demo in weeks
 
 | ✅ Ready in v0.1 | ❌ Not in MVP |
 |-----------------|--------------|
-| Email **magic-link auth** (NextAuth.js) | Rich media uploads |
+| Email **magic-link auth** (NextAuth.js) via Mailgun | Rich media uploads |
 | **Public & private channels** | Mobile apps |
 | **Direct messages (DMs)** | Push / desktop notifications |
 | **OpenAI chatbot per channel** (user supplies their own API key) | Landing-page marketing site |

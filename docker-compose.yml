@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: stonefruit
+      POSTGRES_PASSWORD: stonefruit
+      POSTGRES_DB: stonefruit
+    ports:
+      - "5432:5432"   # host → container
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
