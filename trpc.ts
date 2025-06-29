@@ -4,8 +4,11 @@ import { prisma } from "@/prisma/prisma";
 import { z } from "zod";
 import { EventEmitter } from "events";
 
-// Simple in-memory pubsub for new messages
-const messageEvents = new EventEmitter();
+// Simple in-memory pubsub (shared across route workers)
+const globalForEvents = globalThis as unknown as { messageBus?: EventEmitter };
+const messageEvents =
+  globalForEvents.messageBus || (globalForEvents.messageBus = new EventEmitter());
+globalForEvents.messageBus = messageEvents;
 
 // Context: attach NextAuth session
 export async function createContext() {
@@ -46,7 +49,7 @@ async function getGeneralChannel(userId: string) {
 export const appRouter = router({
   ping: publicProcedure.query(() => "pong"),
 
-  listMessages: publicProcedure.query(async () => {
+  listMessages: protectedProcedure.query(async ({ ctx }) => {
     const channel = await prisma.channel.findUnique({
       where: { id: GENERAL_CHANNEL_ID },
     });
