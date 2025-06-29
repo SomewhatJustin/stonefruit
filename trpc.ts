@@ -7,7 +7,8 @@ import { EventEmitter } from "events";
 // Simple in-memory pubsub (shared across route workers)
 const globalForEvents = globalThis as unknown as { messageBus?: EventEmitter };
 const messageEvents =
-  globalForEvents.messageBus || (globalForEvents.messageBus = new EventEmitter());
+  globalForEvents.messageBus ||
+  (globalForEvents.messageBus = new EventEmitter());
 globalForEvents.messageBus = messageEvents;
 
 // Context: attach NextAuth session
@@ -34,7 +35,8 @@ const GENERAL_CHANNEL_ID = "general";
 
 // Utility: ensure general channel exists and return it
 async function getGeneralChannel(userId: string) {
-  return prisma.channel.upsert({
+  // Upsert the general channel
+  const channel = await prisma.channel.upsert({
     where: { id: GENERAL_CHANNEL_ID },
     update: {},
     create: {
@@ -44,6 +46,30 @@ async function getGeneralChannel(userId: string) {
       isDirect: false,
     },
   });
+
+  // Fetch all users
+  const users = await prisma.user.findMany();
+
+  // Add each user as a member of the general channel if not already
+  await Promise.all(
+    users.map(async (user) => {
+      await prisma.channelMember.upsert({
+        where: {
+          channelId_userId: {
+            channelId: GENERAL_CHANNEL_ID,
+            userId: user.id,
+          },
+        },
+        update: {},
+        create: {
+          channelId: GENERAL_CHANNEL_ID,
+          userId: user.id,
+        },
+      });
+    })
+  );
+
+  return channel;
 }
 
 export const appRouter = router({
@@ -61,6 +87,21 @@ export const appRouter = router({
       include: { sender: true },
     });
     return msgs;
+  }),
+
+  listChannels: protectedProcedure.query(async ({ ctx }) => {
+    const { session } = ctx;
+    const userId = session!.user!.id as string;
+    const channels = await prisma.channel.findMany({
+      where: {
+        members: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+    return channels;
   }),
 
   postMessage: protectedProcedure
@@ -87,4 +128,4 @@ export const appRouter = router({
 export type AppRouter = typeof appRouter;
 
 // Export pubsub for WS route
-export { messageEvents }; 
+export { messageEvents };
