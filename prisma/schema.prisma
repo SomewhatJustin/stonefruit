@@ -10,7 +10,7 @@ datasource db {
 
 /// -----------------------------
 ///  Core auth / user models
-///  (matches NextAuth.js adapter)
+///  (matches Auth.js adapter)
 /// -----------------------------
 model User {
   id            String    @id @default(cuid())
