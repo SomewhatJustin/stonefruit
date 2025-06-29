@@ -1,49 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-interface Message {
-  id: string;
-  content: string;
-  createdAt: string;
-  sender?: { email?: string | null };
-}
+import { useEffect } from "react";
+import { trpc } from "@/lib/trpcClient";
 
 export default function ChatDemo() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+  const utils = trpc.useUtils();
+  const {
+    data: messages = [],
+    isLoading: loading,
+  } = trpc.listMessages.useQuery();
 
-  const fetchMessages = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        "/api/trpc/listMessages?input=%7B%7D", // listMessages expects encoded {}
-      );
-      const json = await res.json();
-      setMessages(json?.result?.data ?? []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const postMutation = trpc.postMessage.useMutation({
+    onSuccess: () => {
+      // no-op; websocket will deliver the message
+    },
+  });
 
-  const sendHello = async () => {
-    try {
-      await fetch("/api/trpc/postMessage", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ text: "hello from ui" }),
-      });
-      // optimistically refresh list
-      fetchMessages();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const sendHello = () => postMutation.mutate({ text: "hello from ui" });
 
   useEffect(() => {
-    fetchMessages();
+    // initial data already fetched by react-query
 
     // establish WebSocket for realtime
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -56,8 +32,9 @@ export default function ChatDemo() {
 
     ws.onmessage = (e) => {
       try {
-        const msg: Message = JSON.parse(e.data);
-        setMessages((prev) => [...prev, msg]);
+        const msg = JSON.parse(e.data);
+        console.log("📨 WS message", msg);
+        utils.listMessages.setData(undefined, (old = []) => [...old, msg]);
       } catch (err) {
         console.error("bad ws payload", err);
       }
@@ -72,12 +49,6 @@ export default function ChatDemo() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
-        <button
-          onClick={fetchMessages}
-          className="border px-2 py-1 rounded"
-        >
-          Refresh
-        </button>
         <button onClick={sendHello} className="border px-2 py-1 rounded">
           Send hello
         </button>
