@@ -66,7 +66,7 @@ async function getGeneralChannel(userId: string) {
           userId: user.id,
         },
       });
-    })
+    }),
   );
 
   return channel;
@@ -102,6 +102,25 @@ export const appRouter = router({
       },
     });
     return channels;
+  }),
+
+  listDirectMessages: protectedProcedure.query(async ({ ctx }) => {
+    const { session } = ctx;
+    const userId = session!.user!.id as string;
+    const directMessages = await prisma.user.findMany({
+      where: {
+        id: {
+          not: userId,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+      },
+    });
+    return directMessages;
   }),
 
   postMessage: protectedProcedure

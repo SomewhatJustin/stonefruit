@@ -39,16 +39,14 @@ export default async function Home() {
   }
 
   const ctx = await createContext();
-  const channels = await appRouter
-    .createCaller(ctx)
-    .listChannels();
-  console.log("channels", channels);
+  const channels = await appRouter.createCaller(ctx).listChannels();
+  const dms = await appRouter.createCaller(ctx).listDirectMessages();
 
   // Logged in: show sidebar and full UI
   return (
     <SidebarProvider>
       {/* Sidebar */}
-      <AppSidebar channels={channels} />
+      <AppSidebar channels={channels} dms={dms} />
 
       {/* Main content area */}
       <SidebarInset>

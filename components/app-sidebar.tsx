@@ -15,10 +15,10 @@ import {
   Trash2,
 } from "lucide-react";
 
-import NavChannels from "@/components/nav-favorites";
+import NavChannels from "@/components/nav-channels";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavWorkspaces } from "@/components/nav-workspaces";
+import { NavMessages } from "@/components/nav-messages";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -208,8 +208,9 @@ const data = {
 
 export function AppSidebar({
   channels,
+  dms,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { channels: any[] }) {
+}: React.ComponentProps<typeof Sidebar> & { channels: any[]; dms: any[] }) {
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
@@ -218,7 +219,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavChannels channels={channels} />
-        <NavWorkspaces workspaces={data.workspaces} />
+        <NavMessages dms={dms} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
