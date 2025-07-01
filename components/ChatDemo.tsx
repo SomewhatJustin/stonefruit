@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpcClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"
 
 export default function ChatDemo() {
   const utils = trpc.useUtils();
@@ -9,14 +11,14 @@ export default function ChatDemo() {
     data: messages = [],
     isLoading: loading,
   } = trpc.listMessages.useQuery();
-
+  const [message, setMessage] = useState("");
   const postMutation = trpc.postMessage.useMutation({
     onSuccess: () => {
       // no-op; websocket will deliver the message
     },
   });
 
-  const sendHello = () => postMutation.mutate({ text: "hello from ui" });
+  const sendMessage = (message: string) => postMutation.mutate({ text: message });
 
   useEffect(() => {
     // initial data already fetched by react-query
@@ -47,23 +49,46 @@ export default function ChatDemo() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <button onClick={sendHello} className="border px-2 py-1 rounded">
-          Send hello
-        </button>
+    <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end">
+      <div className="flex flex-col flex-1 justify-end">
+        <div className="flex-1 flex flex-col justify-end overflow-y-auto">
+          <ul className="mt-2 list-inside text-sm">
+            {loading && <div>Loading…</div>}
+            {messages.map((m) => (
+              <li key={m.id}>
+                <span className="font-mono text-xs text-gray-500 w-32 inline-block">
+                  {new Date(m.createdAt).toLocaleTimeString()}
+                </span>{" "}
+                {m.sender?.email ?? "anon"}: {m.content}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex gap-2 mt-4 justify-end">
+          <Input
+            type="text"
+            className="border px-2 py-1 rounded"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && message.trim() !== "") {
+                sendMessage(message);
+                setMessage("");
+              }
+            }}
+          />
+          <Button
+            onClick={() => {
+              if (message.trim() !== "") {
+                sendMessage(message);
+                setMessage("");
+              }
+            }}
+            className="border px-2 py-1 rounded"
+          >
+            Send
+          </Button>
+        </div>
       </div>
-      {loading && <div>Loading…</div>}
-      <ul className="mt-2 list-disc list-inside text-sm">
-        {messages.map((m) => (
-          <li key={m.id}>
-            <span className="font-mono text-xs text-gray-500">
-              {new Date(m.createdAt).toLocaleTimeString()}
-            </span>{" "}
-            {m.sender?.email ?? "anon"}: {m.content}
-          </li>
-        ))}
-      </ul>
     </div>
-  );
-} 
+  )};

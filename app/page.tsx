@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
-import { SignIn } from "@/app/components/SignIn";
-import { SignOut } from "@/app/components/SignOut";
+import { SignIn } from "@/components/SignIn";
+import { SignOut } from "@/components/SignOut";
 import ChatDemo from "../components/ChatDemo";
 
 // Sidebar & navigation components
@@ -76,7 +76,7 @@ export default async function Home() {
         </header>
 
         {/* Page body */}
-        <main className="flex flex-col gap-8 p-6">
+        <main className="flex flex-col gap-8 p-6 h-full">
           <ChatDemo />
         </main>
       </SidebarInset>
