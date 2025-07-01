@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { SignIn } from "@/app/components/SignIn";
-import { SignOut } from "./components/SignOut";
-import ChatDemo from "./components/ChatDemo";
+import { SignOut } from "@/app/components/SignOut";
+import ChatDemo from "../components/ChatDemo";
 
 // Sidebar & navigation components
 import { AppSidebar } from "@/components/app-sidebar";
@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/sidebar";
 import { trpc } from "@/lib/trpcClient";
 import { appRouter, createContext } from "@/trpc";
+
+import { useEffect } from "React";
 
 export default async function Home() {
   const session = await auth();
@@ -51,8 +53,8 @@ export default async function Home() {
       {/* Main content area */}
       <SidebarInset>
         {/* Header */}
-        <header className="flex h-14 shrink-0 items-center gap-2">
-          <div className="flex flex-1 items-center gap-2 px-3">
+        <header className="flex h-14 shrink-0 items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
             <Separator
               orientation="vertical"
@@ -68,13 +70,8 @@ export default async function Home() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-
-          <div className="ml-auto flex items-center gap-2 px-3">
-            <div className="hidden text-sm text-muted-foreground sm:block">
-              {session.user.email}
-            </div>
+          <div className="px-3">
             <SignOut />
-            <NavActions />
           </div>
         </header>
 
