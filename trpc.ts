@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/prisma/prisma";
 import { z } from "zod";
 import { EventEmitter } from "events";
+import type { Channel } from "@prisma/client";
 
 // Simple in-memory pubsub (shared across route workers)
 const globalForEvents = globalThis as unknown as { messageBus?: EventEmitter };
@@ -28,10 +29,50 @@ export const protectedProcedure = publicProcedure.use(
       throw new Error("UNAUTHORIZED");
     }
     return next({ ctx: { session: ctx.session } });
-  }),
+  })
 );
 
 const GENERAL_CHANNEL_ID = "general";
+
+// Utility: get or create a 1-to-1 direct-message channel for two users
+async function ensureDirectChannel(
+  userA: string,
+  userB: string
+): Promise<Channel> {
+  const directHash = [userA, userB].sort().join(":");
+
+  // Try to find an existing DM channel
+  let channel = await prisma.channel.findUnique({ where: { directHash } });
+
+  if (!channel) {
+    // Create the channel & memberships
+    channel = await prisma.channel.create({
+      data: {
+        name: null,
+        isDirect: true,
+        creatorId: userA,
+        directHash,
+        members: {
+          create: [{ userId: userA }, { userId: userB }],
+        },
+      },
+    });
+  } else {
+    // Ensure both users are members (idempotent upserts)
+    await prisma.channelMember.upsert({
+      where: { channelId_userId: { channelId: channel.id, userId: userA } },
+      update: {},
+      create: { channelId: channel.id, userId: userA },
+    });
+    await prisma.channelMember.upsert({
+      where: { channelId_userId: { channelId: channel.id, userId: userB } },
+      update: {},
+      create: { channelId: channel.id, userId: userB },
+    });
+  }
+
+  return channel;
+}
 
 // Utility: ensure general channel exists and return it
 async function getGeneralChannel(userId: string) {
@@ -66,7 +107,7 @@ async function getGeneralChannel(userId: string) {
           userId: user.id,
         },
       });
-    }),
+    })
   );
 
   return channel;
@@ -75,25 +116,44 @@ async function getGeneralChannel(userId: string) {
 export const appRouter = router({
   ping: publicProcedure.query(() => "pong"),
 
-  listMessages: protectedProcedure.query(async ({ ctx }) => {
-    const channel = await prisma.channel.findUnique({
-      where: { id: GENERAL_CHANNEL_ID },
-    });
-    if (!channel) return [];
-    const msgs = await prisma.message.findMany({
-      where: { channelId: channel.id },
-      orderBy: { createdAt: "asc" },
-      take: 100,
-      include: { sender: true },
-    });
-    return msgs;
-  }),
+  listMessages: protectedProcedure
+    .input(z.object({ kind: z.enum(["channel", "dm"]), id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (input.kind === "channel") {
+        const channel = await prisma.channel.findUnique({
+          where: { id: input.id },
+        });
+        if (!channel) return [];
+        const msgs = await prisma.message.findMany({
+          where: { channelId: channel.id },
+          orderBy: { createdAt: "asc" },
+          take: 100,
+          include: { sender: true },
+        });
+        return msgs;
+      } else if (input.kind === "dm") {
+        const { session } = ctx;
+        const currentUserId = session!.user!.id as string;
+
+        // Ensure DM channel exists between current user & `input.id`
+        const channel = await ensureDirectChannel(currentUserId, input.id);
+
+        const msgs = await prisma.message.findMany({
+          where: { channelId: channel.id },
+          orderBy: { createdAt: "asc" },
+          take: 100,
+          include: { sender: true },
+        });
+        return msgs;
+      }
+    }),
 
   listChannels: protectedProcedure.query(async ({ ctx }) => {
     const { session } = ctx;
     const userId = session!.user!.id as string;
     const channels = await prisma.channel.findMany({
       where: {
+        isDirect: false,
         members: {
           some: {
             userId: userId,
@@ -124,21 +184,44 @@ export const appRouter = router({
   }),
 
   postMessage: protectedProcedure
-    .input(z.object({ text: z.string().min(1) }))
+    .input(
+      z.object({
+        text: z.string().min(1),
+        kind: z.enum(["channel", "dm"]),
+        id: z.string(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const { session } = ctx;
       const userId = session!.user!.id as string;
-      // Ensure channel exists
-      const channel = await getGeneralChannel(userId);
-      const msg = await prisma.message.create({
-        data: {
-          channelId: channel.id,
-          senderId: userId,
-          content: input.text,
-        },
-        include: { sender: true },
-      });
-      // Emit event
+
+      // Declare variable here so it's in scope for the entire mutation
+      let msg: Awaited<ReturnType<typeof prisma.message.create>>;
+
+      if (input.kind === "channel") {
+        msg = await prisma.message.create({
+          data: {
+            channelId: input.id,
+            senderId: userId,
+            content: input.text,
+          },
+          include: { sender: true },
+        });
+      } else {
+        // Direct message branch – input.id is the other participant's user id
+        const channel = await ensureDirectChannel(userId, input.id);
+
+        msg = await prisma.message.create({
+          data: {
+            senderId: userId,
+            channelId: channel.id,
+            content: input.text,
+          },
+          include: { sender: true },
+        });
+      }
+
+      // Broadcast via WebSocket
       messageEvents.emit("new", msg);
       return msg;
     }),

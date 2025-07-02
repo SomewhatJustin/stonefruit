@@ -39,7 +39,7 @@ export function NavMessages({
         {dms.map((dm) => (
           <SidebarMenuItem key={dm.id}>
             <SidebarMenuButton asChild>
-              <a href={`/channels/${dm.id}`} title={dm.email}>
+              <a href={`/dm/${dm.id}`} title={dm.email}>
                 <span>{dm.email}</span>
               </a>
             </SidebarMenuButton>

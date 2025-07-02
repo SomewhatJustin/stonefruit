@@ -2,8 +2,6 @@ import { auth } from "@/auth";
 import { SignIn } from "@/components/SignIn";
 import { SignOut } from "@/components/SignOut";
 import ChatPanel from "@/components/ChatPanel";
-
-// Sidebar & navigation components
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -19,17 +17,20 @@ import {
 } from "@/components/ui/sidebar";
 import { appRouter, createContext } from "@/trpc";
 
-export default async function Home() {
+export default async function ChannelPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const session = await auth();
 
   if (!session?.user) {
-    // Not logged in: only show login tools
     return (
       <div className="flex flex-col min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-6">
           <SignIn />
           <div className="text-muted-foreground text-center">
-            Please sign in to use the chat demo.
+            Please sign in to view this channel.
           </div>
         </div>
       </div>
@@ -37,18 +38,16 @@ export default async function Home() {
   }
 
   const ctx = await createContext();
-  const channels = await appRouter.createCaller(ctx).listChannels();
-  const dms = await appRouter.createCaller(ctx).listDirectMessages();
+  const caller = appRouter.createCaller(ctx);
+  const channels = await caller.listChannels();
+  const dms = await caller.listDirectMessages();
+  // Fallback: get channel name
+  const currentChannel = channels.find((c) => c.id === params.id);
 
-  // Logged in: show sidebar and full UI
   return (
     <SidebarProvider>
-      {/* Sidebar */}
       <AppSidebar channels={channels} dms={dms} />
-
-      {/* Main content area */}
       <SidebarInset>
-        {/* Header */}
         <header className="flex h-14 shrink-0 items-center gap-2 justify-between">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
@@ -60,7 +59,7 @@ export default async function Home() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="line-clamp-1">
-                    Chat Demo
+                    {currentChannel?.name ?? params.id}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -70,12 +69,10 @@ export default async function Home() {
             <SignOut />
           </div>
         </header>
-
-        {/* Page body */}
         <main className="flex flex-col gap-8 p-6 h-full">
-          {/* <ChatPanel /> */}
+          <ChatPanel context={{ kind: "channel", id: params.id }} />
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
-}
+} 
