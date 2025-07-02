@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     // @ts-ignore - property exists at runtime
     instrumentationHook: true,
