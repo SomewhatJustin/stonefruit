@@ -31,25 +31,20 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel run --no-autoupdate ${CLOUDFLARE_TUNNEL_NAME}
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    env_file: .env # must contain CLOUDFLARE_TUNNEL_TOKEN=...
+    command: tunnel run # ← nothing else needed
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:2000/ready"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-    depends_on:
-      - app
-    env_file: .env # keeps CLOUDFLARE_TUNNEL_TOKEN
     ports:
-      - "2000:2000" # expose /ready locally
+      - "2000:2000"
 
 volumes:
   pgdata:
