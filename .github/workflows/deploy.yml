@@ -25,10 +25,13 @@ jobs:
           tags: ghcr.io/somewhatjustin/stonefruit:latest
 
       # Write SSH private key
-      - name: Setup SSH key
+      - name: Create SSH key file from secret
         run: |
-          echo "${{ secrets.VPS_SSH_KEY }}" > private_key
+          cat <<EOF > private_key
+          ${{ secrets.VPS_SSH_KEY }}
+          EOF
           chmod 600 private_key
+        shell: bash
 
       # SSH into VPS and restart the stack
       - uses: appleboy/ssh-action@v1
