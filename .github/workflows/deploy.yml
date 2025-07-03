@@ -22,7 +22,7 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.actor }}/slack-mvp:latest
+          tags: ghcr.io/${{ github.actor }}/stonefruit:latest
 
       # Decode base64 SSH key
       - name: Decode SSH key
@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ github.workspace }}/private_key
           script: |
-            cd /opt/slack-mvp
+            cd /opt/stonefruit
             docker compose pull app
             docker compose up -d
             docker image prune -f
