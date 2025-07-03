@@ -24,12 +24,18 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.actor }}/slack-mvp:latest
 
+      # Decode base64 SSH key
+      - name: Decode SSH key
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY_BASE64 }}" | base64 -d > private_key
+          chmod 600 private_key
+
       # SSH into VPS and restart the stack
       - uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }} # add your private key as a secret
+          key: ${{ github.workspace }}/private_key
           script: |
             cd /opt/slack-mvp
             docker compose pull app
