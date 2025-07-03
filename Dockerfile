@@ -16,7 +16,9 @@ RUN pnpm build
 # Production image, copy all the files and run next
 FROM node:22-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
+
+RUN corepack enable
 
 # Copy built app and node_modules
 COPY --from=builder /app/.next ./.next
@@ -27,5 +29,4 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 3000
-
 CMD ["pnpm", "start"] 
