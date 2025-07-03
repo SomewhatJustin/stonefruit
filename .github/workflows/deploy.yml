@@ -27,7 +27,7 @@ jobs:
       # Decode base64 SSH key
       - name: Decode SSH key
         run: |
-          echo "${{ secrets.VPS_SSH_KEY_BASE64 }}" | base64 -d > private_key
+          echo '${{ secrets.VPS_SSH_KEY_BASE64 }}' | base64 -d > private_key
           chmod 600 private_key
 
       # SSH into VPS and restart the stack
