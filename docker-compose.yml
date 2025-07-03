@@ -32,18 +32,16 @@ services:
     depends_on:
       - app
     env_file: .env # keeps CLOUDFLARE_TUNNEL_TOKEN
-    command: # ← list form = no quoting/escaping surprises
-      - tunnel
-      - run
-      - --no-autoupdate
-      - --token
-      - ${CLOUDFLARE_TUNNEL_TOKEN}
-      - --protocol
-      - http2 # use TCP (HTTP/2) instead of QUIC/UDP
-      - --metrics
-      - 0.0.0.0:2000 # health endpoint
-      - --loglevel
-      - debug # verbose logs
+    command:
+      - "tunnel"
+      - "run"
+      - "--no-autoupdate"
+      - "--protocol"
+      - "http2"
+      - "--metrics"
+      - "0.0.0.0:2000"
+      - "--token"
+      - "${CLOUDFLARE_TUNNEL_TOKEN}"
     ports:
       - "2000:2000" # expose /ready locally
 
