@@ -32,7 +32,7 @@ services:
     container_name: cloudflared
     restart: unless-stopped
     env_file: .env # must contain CLOUDFLARE_TUNNEL_TOKEN=...
-    command: tunnel run # ← nothing else needed
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:2000/ready"]
       interval: 30s
