@@ -31,16 +31,21 @@ services:
     restart: unless-stopped
     depends_on:
       - app
-    command: >
-      tunnel --no-autoupdate
-             run
-             --loglevel debug          # extra logs
-             --protocol http2          # TCP instead of QUIC
-             --metrics 0.0.0.0:2000    # local health port
-             --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    env_file: .env # holds CLOUDFLARE_TUNNEL_TOKEN
+    env_file: .env # keeps CLOUDFLARE_TUNNEL_TOKEN
+    command: # ← list form = no quoting/escaping surprises
+      - tunnel
+      - run
+      - --no-autoupdate
+      - --token
+      - ${CLOUDFLARE_TUNNEL_TOKEN}
+      - --protocol
+      - http2 # use TCP (HTTP/2) instead of QUIC/UDP
+      - --metrics
+      - 0.0.0.0:2000 # health endpoint
+      - --loglevel
+      - debug # verbose logs
     ports:
-      - "2000:2000"
+      - "2000:2000" # expose /ready locally
 
 volumes:
   pgdata:
