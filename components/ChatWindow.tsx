@@ -7,7 +7,7 @@ import MessageInput from "./MessageInput";
 
 // Infer message shape from tRPC output
 type RouterOutputs = inferRouterOutputs<AppRouter>;
-export type ChatMessage = RouterOutputs["listMessages"][number];
+export type ChatMessage = NonNullable<RouterOutputs["listMessages"]>[number];
 
 interface ChatWindowProps {
   messages: ChatMessage[];
@@ -15,7 +15,11 @@ interface ChatWindowProps {
   sendMessage: (text: string) => void;
 }
 
-export default function ChatWindow({ messages, isLoading, sendMessage }: ChatWindowProps) {
+export default function ChatWindow({
+  messages,
+  isLoading,
+  sendMessage,
+}: ChatWindowProps) {
   return (
     <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end">
       <div className="flex flex-col flex-1 justify-end">
@@ -26,4 +30,4 @@ export default function ChatWindow({ messages, isLoading, sendMessage }: ChatWin
       </div>
     </div>
   );
-} 
+}

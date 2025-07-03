@@ -5,10 +5,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    // @ts-ignore - property exists at runtime
-    instrumentationHook: true,
-  } as any,
 };
 
 export default nextConfig;

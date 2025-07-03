@@ -17,7 +17,12 @@ import {
 } from "@/components/ui/sidebar";
 import { appRouter, createContext } from "@/trpc";
 
-export default async function DmPage({ params }: { params: { uid: string } }) {
+export default async function DmPage({
+  params,
+}: {
+  params: Promise<{ uid: string }>;
+}) {
+  const { uid } = await params;
   const session = await auth();
 
   if (!session?.user) {
@@ -37,7 +42,7 @@ export default async function DmPage({ params }: { params: { uid: string } }) {
   const caller = appRouter.createCaller(ctx);
   const channels = await caller.listChannels();
   const dms = await caller.listDirectMessages();
-  const dmUser = dms.find((u) => u.id === params.uid);
+  const dmUser = dms.find((u) => u.id === uid);
 
   return (
     <SidebarProvider>
@@ -54,7 +59,7 @@ export default async function DmPage({ params }: { params: { uid: string } }) {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="line-clamp-1">
-                    {dmUser?.email ?? params.uid}
+                    {dmUser?.email ?? uid}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -66,7 +71,7 @@ export default async function DmPage({ params }: { params: { uid: string } }) {
         </header>
         <main className="flex flex-col gap-8 p-6 h-full">
           <ChatPanel
-            context={{ kind: "dm", id: params.uid }}
+            context={{ kind: "dm", id: uid }}
             userId={session.user.id!}
           />
         </main>

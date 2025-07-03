@@ -20,8 +20,9 @@ import { appRouter, createContext } from "@/trpc";
 export default async function ChannelPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const session = await auth();
 
   if (!session?.user) {
@@ -42,7 +43,7 @@ export default async function ChannelPage({
   const channels = await caller.listChannels();
   const dms = await caller.listDirectMessages();
   // Fallback: get channel name
-  const currentChannel = channels.find((c) => c.id === params.id);
+  const currentChannel = channels.find((c) => c.id === id);
 
   return (
     <SidebarProvider>
@@ -59,7 +60,7 @@ export default async function ChannelPage({
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="line-clamp-1">
-                    {currentChannel?.name ?? params.id}
+                    {currentChannel?.name ?? id}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -70,9 +71,12 @@ export default async function ChannelPage({
           </div>
         </header>
         <main className="flex flex-col gap-8 p-6 h-full">
-          <ChatPanel context={{ kind: "channel", id: params.id }} />
+          <ChatPanel
+            context={{ kind: "channel", id }}
+            userId={session.user.id!}
+          />
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
-} 
+}
