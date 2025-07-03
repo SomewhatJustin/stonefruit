@@ -24,21 +24,12 @@ jobs:
           push: true
           tags: ghcr.io/somewhatjustin/stonefruit:latest
 
-      # Write SSH private key
-      - name: Create SSH key file from secret
-        run: |
-          cat <<EOF > private_key
-          ${{ secrets.VPS_SSH_KEY }}
-          EOF
-          chmod 600 private_key
-        shell: bash
-
       # SSH into VPS and restart the stack
       - uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ github.workspace }}/private_key
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /opt/stonefruit
             docker compose pull app
