@@ -22,7 +22,7 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.actor }}/stonefruit:latest
+          tags: ghcr.io/${{ github.actor.toLowerCase() }}/stonefruit:latest
 
       # Decode base64 SSH key
       - name: Decode SSH key
