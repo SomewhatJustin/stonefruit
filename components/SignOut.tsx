@@ -1,15 +1,17 @@
-import { signOut } from "@/auth";
+import { signOut } from "@/auth"
 
 export function SignOut({ className, ...props }: React.ComponentProps<"form">) {
   return (
     <form
       action={async () => {
-        "use server";
-        await signOut();
+        "use server"
+        await signOut()
       }}
       className={className}
     >
-      <button type="submit">Sign Out</button>
+      <button type="submit" className="text-sm">
+        Sign Out
+      </button>
     </form>
-  );
+  )
 }

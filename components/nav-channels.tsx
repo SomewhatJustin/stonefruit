@@ -25,21 +25,25 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavChannels({ channels }: { channels: { id: string; name: string }[] }) {
+export function NavChannels({
+  channels,
+}: {
+  channels: { id: string; name: string }[]
+}) {
   const { isMobile } = useSidebar()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Channels</SidebarGroupLabel>
       <SidebarMenu>
-        {channels.map((channel) => (
+        {channels.map(channel => (
           <SidebarMenuItem key={channel.id}>
             <SidebarMenuButton asChild>
               <a href={`/channels/${channel.id}`} title={channel.name}>
                 <span>{channel.name}</span>
               </a>
             </SidebarMenuButton>
-            <DropdownMenu>
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
@@ -70,18 +74,18 @@ export function NavChannels({ channels }: { channels: { id: string; name: string
                   <span>Delete</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
+          {/* <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal />
             <span>More</span>
-          </SidebarMenuButton>
+          </SidebarMenuButton> */}
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   )
 }
 
-export default NavChannels;
+export default NavChannels

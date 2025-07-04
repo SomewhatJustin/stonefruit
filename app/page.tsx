@@ -1,26 +1,19 @@
-import { auth } from "@/auth";
-import { SignIn } from "@/components/SignIn";
-import { SignOut } from "@/components/SignOut";
-import ChatPanel from "@/components/ChatPanel";
+import { auth } from "@/auth"
+import { SignIn } from "@/components/SignIn"
+import { SignOut } from "@/components/SignOut"
 
 // Sidebar & navigation components
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+import { AppSidebar } from "@/components/app-sidebar"
+import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { appRouter, createContext } from "@/trpc";
+} from "@/components/ui/sidebar"
+import { appRouter, createContext } from "@/trpc"
 
 export default async function Home() {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user) {
     // Not logged in: only show login tools
@@ -33,22 +26,18 @@ export default async function Home() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  const ctx = await createContext();
-  const channels = await appRouter.createCaller(ctx).listChannels();
-  const dms = await appRouter.createCaller(ctx).listDirectMessages();
+  const ctx = await createContext()
+  const channels = await appRouter.createCaller(ctx).listChannels()
+  const dms = await appRouter.createCaller(ctx).listDirectMessages()
 
   // Logged in: show sidebar and full UI
   return (
     <SidebarProvider>
-      {/* Sidebar */}
       <AppSidebar channels={channels} dms={dms} />
-
-      {/* Main content area */}
       <SidebarInset>
-        {/* Header */}
         <header className="flex h-14 shrink-0 items-center gap-2 justify-between">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
@@ -56,15 +45,6 @@ export default async function Home() {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1">
-                    Chat Demo
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
           </div>
           <div className="px-3">
             <SignOut />
@@ -77,5 +57,5 @@ export default async function Home() {
         </main>
       </SidebarInset>
     </SidebarProvider>
-  );
+  )
 }

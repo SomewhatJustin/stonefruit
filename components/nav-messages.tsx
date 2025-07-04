@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   ArrowUpRight,
@@ -6,7 +6,7 @@ import {
   MoreHorizontal,
   StarOff,
   Trash2,
-} from "lucide-react";
+} from "lucide-react"
 
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -23,27 +23,27 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/sidebar"
 
 export function NavMessages({
   dms,
 }: {
-  dms: { id: string; name: string; email: string }[];
+  dms: { id: string; name: string; email: string }[]
 }) {
-  const { isMobile } = useSidebar();
+  const { isMobile } = useSidebar()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Direct Messages</SidebarGroupLabel>
       <SidebarMenu>
-        {dms.map((dm) => (
+        {dms.map(dm => (
           <SidebarMenuItem key={dm.id}>
             <SidebarMenuButton asChild>
               <a href={`/dm/${dm.id}`} title={dm.email}>
                 <span>{dm.email}</span>
               </a>
             </SidebarMenuButton>
-            <DropdownMenu>
+            {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
@@ -74,18 +74,18 @@ export function NavMessages({
                   <span>Delete</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
+          {/* <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal />
             <span>More</span>
-          </SidebarMenuButton>
+          </SidebarMenuButton> */}
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
-  );
+  )
 }
 
-export default NavMessages;
+export default NavMessages

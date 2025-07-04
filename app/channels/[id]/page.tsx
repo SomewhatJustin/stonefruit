@@ -1,82 +1,10 @@
-import { auth } from "@/auth";
-import { SignIn } from "@/components/SignIn";
-import { SignOut } from "@/components/SignOut";
-import ChatPanel from "@/components/ChatPanel";
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { appRouter, createContext } from "@/trpc";
+import ChatPage from "@/components/ChatPage"
 
 export default async function ChannelPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }) {
-  const { id } = await params;
-  const session = await auth();
-
-  if (!session?.user) {
-    return (
-      <div className="flex flex-col min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <SignIn />
-          <div className="text-muted-foreground text-center">
-            Please sign in to view this channel.
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const ctx = await createContext();
-  const caller = appRouter.createCaller(ctx);
-  const channels = await caller.listChannels();
-  const dms = await caller.listDirectMessages();
-  // Fallback: get channel name
-  const currentChannel = channels.find((c) => c.id === id);
-
-  return (
-    <SidebarProvider>
-      <AppSidebar channels={channels} dms={dms} />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 justify-between">
-          <div className="flex items-center gap-2 px-3">
-            <SidebarTrigger />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1">
-                    {currentChannel?.name ?? id}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <div className="px-3">
-            <SignOut />
-          </div>
-        </header>
-        <main className="flex flex-col gap-8 p-6 h-full">
-          <ChatPanel
-            context={{ kind: "channel", id }}
-            userId={session.user.id!}
-          />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+  const { id } = await params
+  return <ChatPage variant="channel" id={id} />
 }
