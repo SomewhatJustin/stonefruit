@@ -1,20 +1,7 @@
 "use client"
 
-import {
-  ArrowUpRight,
-  Link,
-  MoreHorizontal,
-  StarOff,
-  Trash2,
-} from "lucide-react"
+import { CirclePlus } from "lucide-react"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -24,6 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 
 export function NavConversations({
   channels,
@@ -37,7 +25,13 @@ export function NavConversations({
   return (
     <>
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel>Channels</SidebarGroupLabel>
+        <div className="flex items-center justify-between">
+          <SidebarGroupLabel>Channels</SidebarGroupLabel>
+
+          <Button variant="secondary" size="icon" className="size-8">
+            <CirclePlus />
+          </Button>
+        </div>
         <SidebarMenu>
           {channels.map(channel => (
             <SidebarMenuItem key={channel.id}>

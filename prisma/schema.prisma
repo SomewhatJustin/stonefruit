@@ -80,6 +80,7 @@ model VerificationToken {
 model Channel {
   id        String   @id @default(uuid())
   name      String? // null for 1-to-1 DMs
+  description String?
   isDirect  Boolean  @default(false)
   creatorId String
   createdAt DateTime @default(now())
