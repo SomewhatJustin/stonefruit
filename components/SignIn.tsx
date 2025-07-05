@@ -1,12 +1,12 @@
-import { signIn } from "@/auth";
+import { signIn } from "@/auth"
 
 export function SignIn() {
   return (
     <form
       action={async (formData: FormData) => {
-        "use server";
+        "use server"
         // Email provider id (matches auth.ts configuration)
-        await signIn("mailgun", formData);
+        await signIn("mailgun", formData)
       }}
       className="flex flex-col gap-2"
     >
@@ -24,5 +24,5 @@ export function SignIn() {
         Sign in with Email
       </button>
     </form>
-  );
+  )
 }

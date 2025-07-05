@@ -7,33 +7,34 @@ A **self-host-able, TypeScript-only Slack alternative** you can demo in weeks
 
 ## ✨ Core Features (MVP)
 
-| ✅ Ready in v0.1 | ❌ Not in MVP |
-|-----------------|--------------|
-| Email **magic-link auth** (NextAuth.js) via Mailgun | Rich media uploads |
-| **Public & private channels** | Mobile apps |
-| **Direct messages (DMs)** | Push / desktop notifications |
-| **OpenAI chatbot per channel** (user supplies their own API key) | Landing-page marketing site |
-| Real-time updates via WebSockets | Threading, reactions, etc. |
+| ✅ Ready in v0.1                                                 | ❌ Not in MVP                |
+| ---------------------------------------------------------------- | ---------------------------- |
+| Email **magic-link auth** (NextAuth.js) via Mailgun              | Rich media uploads           |
+| **Public & private channels**                                    | Mobile apps                  |
+| **Direct messages (DMs)**                                        | Push / desktop notifications |
+| **OpenAI chatbot per channel** (user supplies their own API key) | Landing-page marketing site  |
+| Real-time updates via WebSockets                                 | Threading, reactions, etc.   |
 
 ---
 
 ## 🏗️ Tech Decisions
 
-| Layer | Choice | Rationale |
-|-------|--------|-----------|
-| **Frontend & Backend** | **Next.js 15** (App Router, TypeScript) | Single repo, SSR + API + WS in one process |
-| **Auth** | **NextAuth.js** (email provider) | 2-file setup, no external SaaS |
-| **Database** | **PostgreSQL 16 (Docker)** | Battle-tested, self-host-friendly |
-| **ORM** | **Prisma** | Type-safe models, simple migrations |
-| **Real-time transport** | **tRPC + WebSocket handler** | End-to-end types, zero GraphQL boilerplate |
-| **Chatbot** | API route that proxies to `openai.chat.completions` | User adds `OPENAI_API_KEY` → keeps infra simple |
-| **Styling / UI** | **Tailwind CSS + shadcn/ui** | Copy-paste components for speed |
-| **Containerization** | Single **Dockerfile** + (optional) **docker-compose.yml** | Drops onto any Ubuntu VPS |
-| **CI** | GitHub Actions (`docker buildx`) | Free tier, reproducible images |
+| Layer                   | Choice                                                    | Rationale                                       |
+| ----------------------- | --------------------------------------------------------- | ----------------------------------------------- |
+| **Frontend & Backend**  | **Next.js 15** (App Router, TypeScript)                   | Single repo, SSR + API + WS in one process      |
+| **Auth**                | **NextAuth.js** (email provider)                          | 2-file setup, no external SaaS                  |
+| **Database**            | **PostgreSQL 16 (Docker)**                                | Battle-tested, self-host-friendly               |
+| **ORM**                 | **Prisma**                                                | Type-safe models, simple migrations             |
+| **Real-time transport** | **tRPC + WebSocket handler**                              | End-to-end types, zero GraphQL boilerplate      |
+| **Chatbot**             | API route that proxies to `openai.chat.completions`       | User adds `OPENAI_API_KEY` → keeps infra simple |
+| **Styling / UI**        | **Tailwind CSS + shadcn/ui**                              | Copy-paste components for speed                 |
+| **Containerization**    | Single **Dockerfile** + (optional) **docker-compose.yml** | Drops onto any Ubuntu VPS                       |
+| **CI**                  | GitHub Actions (`docker buildx`)                          | Free tier, reproducible images                  |
 
 ---
 
 ## 🗄️ Project Layout
+
 ```
 slack-lite/
 ├─ app/ # Next.js App Router
@@ -57,9 +58,9 @@ slack-lite/
 
 ### 1. Prerequisites
 
-* Node 20+ (use `fnm` or `nvm`)
-* **pnpm** (`corepack enable`)
-* Docker & Docker Compose (for Postgres / production image)
+- Node 20+ (use `fnm` or `nvm`)
+- **pnpm** (`corepack enable`)
+- Docker & Docker Compose (for Postgres / production image)
 
 ### 2. Clone & install
 
@@ -99,6 +100,7 @@ Open http://localhost:3000 — you should see the login screen.
 Magic-link emails will be sent via the SMTP settings you supplied.
 
 ---
+
 ## 🐋 Production with Docker
 
 Build and run everything in one container (behind your own reverse proxy).
@@ -116,13 +118,13 @@ docker run -d --restart=always \
 ---
 
 ## 🔧 Common Tasks
-| Action | Command |
-|--------|---------|
-| Add a new Prisma model | Edit schema.prisma → pnpm prisma migrate dev |
-| Open interactive DB console | pnpm prisma studio |
-| Lint / type-check | pnpm lint / pnpm typecheck |
-| Run Jest tests | pnpm test (coming soon) |
 
+| Action                      | Command                                      |
+| --------------------------- | -------------------------------------------- |
+| Add a new Prisma model      | Edit schema.prisma → pnpm prisma migrate dev |
+| Open interactive DB console | pnpm prisma studio                           |
+| Lint / type-check           | pnpm lint / pnpm typecheck                   |
+| Run Jest tests              | pnpm test (coming soon)                      |
 
 ## 🛣️ Roadmap
 
