@@ -12,3 +12,7 @@ docker compose down -v # same as: docker compose down --volumes
 docker volume prune -f
 docker image prune -f # this keeps the repo small
 ```
+
+## Restart the app
+
+`docker compose restart app`

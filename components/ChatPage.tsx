@@ -58,7 +58,12 @@ export default async function ChatPage(props: ChatPageProps) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage className="line-clamp-1">
-              {currentChannel?.name ?? props.id}
+              {`#${currentChannel?.name ?? props.id}`}
+              {currentChannel?.description && (
+                <span className="text-sm text-muted-foreground ml-2">
+                  {currentChannel.description}
+                </span>
+              )}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
