@@ -26,12 +26,12 @@ export function useChat(context: ChatContext, userId: string) {
       process.env.NEXT_PUBLIC_WS_URL ||
       (window.location.protocol === "https:"
         ? `wss://${window.location.host}/ws`
-        : `ws://${window.location.hostname}:$${
+        : `ws://${window.location.hostname}:${
             process.env.NEXT_PUBLIC_WS_PORT || 3001
           }`)
 
     const ws = new WebSocket(wsUrl)
-
+    console.log("🔌 WS URL", wsUrl)
     ws.onopen = () => console.log("🔌 WS connected")
     ws.onerror = e => console.error("WS error", e)
 
