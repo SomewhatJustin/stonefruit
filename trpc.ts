@@ -182,6 +182,7 @@ export const appRouter = router({
         name: true,
         username: true,
         email: true,
+        image: true,
       },
     })
     return directMessages

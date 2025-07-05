@@ -1,21 +1,6 @@
 "use client"
 
 import {
-  ArrowUpRight,
-  Link,
-  MoreHorizontal,
-  StarOff,
-  Trash2,
-} from "lucide-react"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -28,7 +13,7 @@ import {
 export function NavMessages({
   dms,
 }: {
-  dms: { id: string; name: string; email: string }[]
+  dms: { id: string; name: string; email: string; image?: string }[]
 }) {
   const { isMobile } = useSidebar()
 
@@ -39,7 +24,16 @@ export function NavMessages({
         {dms.map(dm => (
           <SidebarMenuItem key={dm.id}>
             <SidebarMenuButton asChild>
-              <a href={`/dm/${dm.id}`} title={dm.email}>
+              <a
+                href={`/dm/${dm.id}`}
+                title={dm.email}
+                className="flex items-center gap-2"
+              >
+                <img
+                  src={dm.image ?? "/avatars/default.png"}
+                  alt={dm.email}
+                  className="w-5 h-5 rounded-full"
+                />
                 <span>{dm.email}</span>
               </a>
             </SidebarMenuButton>
