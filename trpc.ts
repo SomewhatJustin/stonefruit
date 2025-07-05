@@ -196,7 +196,14 @@ export const appRouter = router({
       const channel = await prisma.channel.create({
         data: {
           name: input.name,
+          description: input.description,
           creatorId: userId,
+          isDirect: false,
+          members: {
+            create: {
+              user: { connect: { id: userId } },
+            },
+          },
         },
       })
       return channel
