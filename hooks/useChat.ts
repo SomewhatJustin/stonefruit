@@ -9,7 +9,18 @@ export function useChat(context: ChatContext, userId: string) {
   // React-Query utilities for cache updates
   const utils = trpc.useUtils()
 
-  const { data: messages = [], isLoading } = trpc.listMessages.useQuery(context)
+  const {
+    data: messages = [],
+    isLoading,
+    error,
+  } = trpc.listMessages.useQuery(context, {
+    // Stop retries to surface errors immediately
+    retry: (failureCount, err: any) => {
+      if (err?.data?.code === "FORBIDDEN") return false
+      // keep default retry for other errors up to 2 attempts
+      return failureCount < 2
+    },
+  })
 
   const postMutation = trpc.postMessage.useMutation()
 
@@ -73,6 +84,7 @@ export function useChat(context: ChatContext, userId: string) {
   return {
     messages,
     isLoading,
+    error,
     sendMessage,
   }
 }

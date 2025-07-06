@@ -4,6 +4,7 @@ import { prisma } from "@/prisma/prisma"
 import { z } from "zod"
 import { EventEmitter } from "events"
 import type { Channel } from "@prisma/client"
+import { TRPCError } from "@trpc/server"
 
 // Simple in-memory pubsub (shared across route workers)
 const globalForEvents = globalThis as unknown as { messageBus?: EventEmitter }
@@ -122,10 +123,25 @@ export const appRouter = router({
     .input(z.object({ kind: z.enum(["channel", "dm"]), id: z.string() }))
     .query(async ({ ctx, input }) => {
       if (input.kind === "channel") {
+        const { session } = ctx
+        const userId = session!.user!.id as string
+
         const channel = await prisma.channel.findUnique({
           where: { id: input.id },
         })
         if (!channel) return []
+
+        // Check membership
+        const membership = await prisma.channelMember.findUnique({
+          where: {
+            channelId_userId: { channelId: channel.id, userId },
+          },
+        })
+
+        if (!membership) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "NOT_MEMBER" })
+        }
+
         const msgs = await prisma.message.findMany({
           where: { channelId: channel.id },
           orderBy: { createdAt: "asc" },
@@ -187,6 +203,86 @@ export const appRouter = router({
     })
     return directMessages
   }),
+
+  listChannelMembers: protectedProcedure
+    .input(z.object({ channelId: z.string() }))
+    .query(async ({ input }) => {
+      const members = await prisma.channelMember.findMany({
+        where: { channelId: input.channelId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      })
+      return members
+    }),
+
+  searchUsers: protectedProcedure
+    .input(z.object({ query: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const users = await prisma.user.findMany({
+        where: {
+          OR: [
+            { email: { contains: input.query, mode: "insensitive" } },
+            { name: { contains: input.query, mode: "insensitive" } },
+            { username: { contains: input.query, mode: "insensitive" } },
+          ],
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          username: true,
+          image: true,
+        },
+        take: 10,
+      })
+      return users
+    }),
+
+  addChannelMember: protectedProcedure
+    .input(z.object({ channelId: z.string(), userId: z.string() }))
+    .mutation(async ({ input }) => {
+      const cm = await prisma.channelMember.upsert({
+        where: {
+          channelId_userId: {
+            channelId: input.channelId,
+            userId: input.userId,
+          },
+        },
+        update: {},
+        create: {
+          channelId: input.channelId,
+          userId: input.userId,
+        },
+      })
+      return cm
+    }),
+
+  removeChannelMember: protectedProcedure
+    .input(z.object({ channelId: z.string(), userId: z.string() }))
+    .mutation(async ({ input }) => {
+      // Delete relation; ignore if not found
+      try {
+        await prisma.channelMember.delete({
+          where: {
+            channelId_userId: {
+              channelId: input.channelId,
+              userId: input.userId,
+            },
+          },
+        })
+      } catch (err) {
+        // noop if not found
+      }
+      return true
+    }),
 
   createChannel: protectedProcedure
     .input(z.object({ name: z.string(), description: z.string() }))

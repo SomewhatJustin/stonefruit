@@ -17,6 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { appRouter, createContext } from "@/trpc"
+import ManageMembersButton from "@/components/manage-members-button"
 
 // Shared chat page that works for both channels and direct messages.
 // Pass `variant` along with the corresponding identifier.
@@ -58,12 +59,15 @@ export default async function ChatPage(props: ChatPageProps) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage className="line-clamp-1">
-              {`#${currentChannel?.name ?? props.id}`}
-              {currentChannel?.description && (
-                <span className="text-sm text-muted-foreground ml-2">
-                  {currentChannel.description}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {`#${currentChannel?.name ?? props.id}`}
+                {currentChannel?.description && (
+                  <span className="text-sm text-muted-foreground ml-2">
+                    {currentChannel.description}
+                  </span>
+                )}
+                <ManageMembersButton channelId={props.id} />
+              </div>
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>

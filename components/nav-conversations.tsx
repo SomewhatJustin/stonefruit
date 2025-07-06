@@ -75,7 +75,7 @@ export function NavConversations({
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="secondary" size="icon" className="size-8">
+              <Button variant="outline" size="icon" className="size-8">
                 <CirclePlus />
               </Button>
             </DialogTrigger>
