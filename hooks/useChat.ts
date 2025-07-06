@@ -45,7 +45,7 @@ export function useChat(context: ChatContext, userId: string) {
 
   // Attach WebSocket listener once on mount
   useEffect(() => {
-    // Determine WebSocket endpoint
+    // Determine WebSocket endpoint once
     const wsUrl =
       process.env.NEXT_PUBLIC_WS_URL ||
       (window.location.protocol === "https:"
@@ -54,16 +54,25 @@ export function useChat(context: ChatContext, userId: string) {
             process.env.NEXT_PUBLIC_WS_PORT || 3001
           }`)
 
-    const ws = new WebSocket(wsUrl)
-    console.log("🔌 WS URL", wsUrl)
-    ws.onopen = () => console.log("🔌 WS connected")
-    ws.onerror = e => console.error("WS error", e)
+    // Share a single WebSocket across the whole app
+    const globalForWs = window as unknown as { __chatWs?: WebSocket }
+    if (!globalForWs.__chatWs || globalForWs.__chatWs.readyState === 3) {
+      globalForWs.__chatWs = new WebSocket(wsUrl)
+      globalForWs.__chatWs.addEventListener("open", () =>
+        console.log("🔌 WS connected")
+      )
+      globalForWs.__chatWs.addEventListener("error", e => {
+        // Log once; avoid React devtools flood
+        console.warn("WS error", e)
+      })
+    }
 
-    ws.onmessage = e => {
+    const ws = globalForWs.__chatWs
+
+    const handleMessage = (e: MessageEvent) => {
       try {
         const data = JSON.parse(e.data)
 
-        // Handle typing payloads first
         if (data.type === "typing") {
           const relevant = context.kind === data.kind && data.id === context.id
           if (relevant && data.userId !== userId) {
@@ -76,7 +85,6 @@ export function useChat(context: ChatContext, userId: string) {
           return
         }
 
-        // Handle new message payloads (no type property)
         let isRelevant = false
         if (context.kind === "channel") {
           isRelevant = data.channelId === context.id
@@ -97,15 +105,17 @@ export function useChat(context: ChatContext, userId: string) {
           )
         }
       } catch (err) {
-        console.error("bad ws payload", err)
+        console.warn("bad ws payload", err)
       }
     }
 
+    ws.addEventListener("message", handleMessage)
+
     return () => {
-      ws.close()
+      ws.removeEventListener("message", handleMessage)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [context.id, context.kind, messages])
 
   return {
     messages,

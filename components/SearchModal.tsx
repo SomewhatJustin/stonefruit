@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -104,6 +105,9 @@ export default function SearchModal({
       <DialogContent className="max-w-5xl w-[90vw] h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="sr-only">Search</DialogTitle>
+          <DialogDescription className="sr-only">
+            Search through your accessible conversations.
+          </DialogDescription>
         </DialogHeader>
         <Input
           autoFocus
