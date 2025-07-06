@@ -44,3 +44,6 @@ node_modules
 
 # generated avatars
 public/avatars/generated
+
+# user uploads
+uploads/

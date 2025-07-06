@@ -1,6 +1,7 @@
 "use client"
 
 import type { ChatMessage } from "./ChatWindow"
+import FileCard from "./FileCard"
 
 interface MessageListProps {
   messages: ChatMessage[]
@@ -16,7 +17,7 @@ export default function MessageList({
   return (
     <>
       {messages.length > 0 ? (
-        <ul className="mt-2 list-inside text-sm space-y-2">
+        <ul className="mt-16 list-inside text-sm space-y-2">
           {isLoading && <div>Loading…</div>}
           {messages.map(m => (
             <li key={m.id} className="flex items-start gap-2">
@@ -32,7 +33,11 @@ export default function MessageList({
                 <span className="font-semibold mr-1">
                   {m.sender?.email ?? "anon"}
                 </span>
-                <span>{m.content}</span>
+                {m.content.startsWith("/files/") ? (
+                  <FileCard url={m.content} />
+                ) : (
+                  <span>{m.content}</span>
+                )}
               </div>
             </li>
           ))}

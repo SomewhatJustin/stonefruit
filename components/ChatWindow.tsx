@@ -23,7 +23,7 @@ export default function ChatWindow({
   currentUserId,
 }: ChatWindowProps) {
   return (
-    <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end">
+    <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end relative">
       <div className="flex flex-col flex-1 justify-end">
         <div className="flex-1 flex flex-col justify-end overflow-y-auto">
           <MessageList
@@ -32,7 +32,12 @@ export default function ChatWindow({
             currentUserId={currentUserId}
           />
         </div>
-        <MessageInput onSend={sendMessage} />
+        <div className="fixed bottom-0 right-0 left-[var(--sidebar-width,16rem)] bg-background z-10 pb-4 px-4">
+          <div className="max-w-3xl mx-auto">
+            <MessageInput onSend={sendMessage} />
+          </div>
+        </div>
+        <div className="h-24" />
       </div>
     </div>
   )

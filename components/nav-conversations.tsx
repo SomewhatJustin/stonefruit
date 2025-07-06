@@ -69,7 +69,7 @@ export function NavConversations({
 
   return (
     <>
-      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
         <div className="flex items-center justify-between">
           <SidebarGroupLabel>Channels</SidebarGroupLabel>
 

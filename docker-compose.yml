@@ -24,8 +24,11 @@ services:
       - "3000:3000"
       - "3001:3001"
     restart: always
+    volumes:
+      - uploads:/app/uploads # persist user-uploaded files
     env_file:
       - .env
 
 volumes:
   pgdata:
+  uploads:
