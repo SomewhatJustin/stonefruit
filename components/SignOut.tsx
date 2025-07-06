@@ -1,4 +1,5 @@
 import { signOut } from "@/auth"
+import { LogOut } from "lucide-react"
 
 export function SignOut({ className, ...props }: React.ComponentProps<"form">) {
   return (
@@ -9,8 +10,8 @@ export function SignOut({ className, ...props }: React.ComponentProps<"form">) {
       }}
       className={className}
     >
-      <button type="submit" className="text-sm">
-        Sign Out
+      <button type="submit" className="text-sm" aria-label="Sign Out">
+        <LogOut className="w-5 h-5" />
       </button>
     </form>
   )
