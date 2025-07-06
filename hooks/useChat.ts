@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState, useRef } from "react"
 import { trpc } from "@/lib/trpcClient"
 
 export type ChatContext = { kind: "channel" | "dm"; id: string }
@@ -30,6 +30,19 @@ export function useChat(context: ChatContext, userId: string) {
     postMutation.mutate({ ...context, text })
   }
 
+  const [typingUser, setTypingUser] = useState<string | null>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastTypingSentRef = useRef(0)
+
+  const typingMutation = trpc.sendTyping.useMutation()
+
+  const sendTyping = () => {
+    const now = Date.now()
+    if (now - lastTypingSentRef.current < 2000) return // throttle 2s
+    lastTypingSentRef.current = now
+    typingMutation.mutate(context)
+  }
+
   // Attach WebSocket listener once on mount
   useEffect(() => {
     // Determine WebSocket endpoint
@@ -48,26 +61,39 @@ export function useChat(context: ChatContext, userId: string) {
 
     ws.onmessage = e => {
       try {
-        const msg = JSON.parse(e.data)
+        const data = JSON.parse(e.data)
 
+        // Handle typing payloads first
+        if (data.type === "typing") {
+          const relevant = context.kind === data.kind && data.id === context.id
+          if (relevant && data.userId !== userId) {
+            setTypingUser(data.name ?? "Someone")
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+            typingTimeoutRef.current = setTimeout(() => {
+              setTypingUser(null)
+            }, 3000)
+          }
+          return
+        }
+
+        // Handle new message payloads (no type property)
         let isRelevant = false
-
         if (context.kind === "channel") {
-          isRelevant = msg.channelId === context.id
+          isRelevant = data.channelId === context.id
         } else if (context.kind === "dm") {
           const currentChannelId = messages[0]?.channelId
           if (currentChannelId) {
-            isRelevant = msg.channelId === currentChannelId
+            isRelevant = data.channelId === currentChannelId
           } else if (messages.length === 0) {
-            // Accept the first message if it's from the current user or the DM partner
-            isRelevant = msg.senderId === userId || msg.senderId === context.id
+            isRelevant =
+              data.senderId === userId || data.senderId === context.id
           }
         }
 
         if (isRelevant) {
           utils.listMessages.setData(
             context,
-            old => [...(old ?? []), msg] as any
+            old => [...(old ?? []), data] as any
           )
         }
       } catch (err) {
@@ -86,5 +112,7 @@ export function useChat(context: ChatContext, userId: string) {
     isLoading,
     error,
     sendMessage,
+    sendTyping,
+    typingUser,
   }
 }

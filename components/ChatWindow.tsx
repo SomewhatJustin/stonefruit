@@ -13,6 +13,8 @@ interface ChatWindowProps {
   messages: ChatMessage[]
   isLoading: boolean
   sendMessage: (text: string) => void
+  sendTyping: () => void
+  typingUser: string | null
   currentUserId: string
 }
 
@@ -20,6 +22,8 @@ export default function ChatWindow({
   messages,
   isLoading,
   sendMessage,
+  sendTyping,
+  typingUser,
   currentUserId,
 }: ChatWindowProps) {
   return (
@@ -32,12 +36,16 @@ export default function ChatWindow({
             currentUserId={currentUserId}
           />
         </div>
-        <div className="fixed bottom-0 right-0 left-[var(--sidebar-width,16rem)] bg-background z-10 pb-4 px-4">
-          <div className="max-w-3xl mx-auto">
-            <MessageInput onSend={sendMessage} />
+        <div className="absolute inset-x-0 bottom-0 bg-background z-10  px-4">
+          <div>
+            {typingUser && (
+              <div className="text-xs text-muted-foreground mb-1">
+                {typingUser} is typing…
+              </div>
+            )}
+            <MessageInput onSend={sendMessage} onTyping={sendTyping} />
           </div>
         </div>
-        <div className="h-24" />
       </div>
     </div>
   )

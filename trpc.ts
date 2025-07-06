@@ -347,6 +347,27 @@ export const appRouter = router({
       messageEvents.emit("new", msg)
       return msg
     }),
+
+  // NEW: send typing indicator (no DB write)
+  sendTyping: protectedProcedure
+    .input(
+      z.object({
+        kind: z.enum(["channel", "dm"]),
+        id: z.string(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const { session } = ctx
+      const userId = session!.user!.id as string
+      messageEvents.emit("typing", {
+        type: "typing",
+        userId,
+        name: session!.user?.name ?? session!.user?.email ?? "Someone",
+        kind: input.kind,
+        id: input.id,
+      })
+      return true
+    }),
 })
 
 export type AppRouter = typeof appRouter

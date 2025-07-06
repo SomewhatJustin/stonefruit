@@ -127,7 +127,3 @@ Returned JSON gives you `/files/<id>-name.ext` which you store in your message r
 1. Swap the `uploads/` path to presigned URLs on Cloudflare R2 (or another CDN-backed object store).
 2. Keep the same front-end API – zero UI changes.
 3. Update download URLs to point to the bucket's CDN.
-
----
-
-### 👍 Ready for review – feel free to comment inline or suggest tweaks.

@@ -17,7 +17,7 @@ export default function MessageList({
   return (
     <>
       {messages.length > 0 ? (
-        <ul className="mt-16 list-inside text-sm space-y-2">
+        <ul className="my-16 list-inside text-sm space-y-2">
           {isLoading && <div>Loading…</div>}
           {messages.map(m => (
             <li key={m.id} className="flex items-start gap-2">

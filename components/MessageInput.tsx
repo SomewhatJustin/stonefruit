@@ -8,11 +8,13 @@ import { toast } from "sonner"
 
 interface MessageInputProps {
   onSend: (text: string) => void
+  onTyping?: () => void
   placeholder?: string
 }
 
 export default function MessageInput({
   onSend,
+  onTyping,
   placeholder,
 }: MessageInputProps) {
   const [value, setValue] = useState("")
@@ -98,7 +100,10 @@ export default function MessageInput({
         className="border px-2 py-1 rounded"
         value={value}
         placeholder={placeholder}
-        onChange={e => setValue(e.target.value)}
+        onChange={e => {
+          setValue(e.target.value)
+          onTyping?.()
+        }}
         onKeyDown={e => {
           if (e.key === "Enter") handleSend()
         }}
