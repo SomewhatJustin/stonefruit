@@ -58,7 +58,7 @@ export default async function ChatPage(props: ChatPageProps) {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbPage className="line-clamp-1 fixed">
+            <BreadcrumbPage className="line-clamp-1">
               <div className="flex items-center gap-2">
                 {`#${currentChannel?.name ?? props.id}`}
                 {currentChannel?.description && (
@@ -83,7 +83,7 @@ export default async function ChatPage(props: ChatPageProps) {
   return (
     <SidebarProvider>
       <AppSidebar channels={channels} dms={dms} />
-      <SidebarInset>
+      <SidebarInset className="min-h-screen">
         <header className="flex h-14 shrink-0 items-center gap-2 justify-between sticky top-0 w-full bg-background z-10">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
@@ -97,7 +97,7 @@ export default async function ChatPage(props: ChatPageProps) {
             <SignOut />
           </div>
         </header>
-        <main className="flex flex-col gap-8 p-6 h-full">
+        <main className="flex flex-col gap-8 px-3 pt-6 h-full">
           <ChatPanel context={chatContext} userId={session.user.id!} />
         </main>
       </SidebarInset>

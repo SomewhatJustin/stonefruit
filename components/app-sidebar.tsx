@@ -31,12 +31,20 @@ export function AppSidebar({
   dms,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { channels: any[]; dms: any[] }) {
+  const navItems = [
+    // {
+    //   title: "Home",
+    //   url: "/",
+    //   icon: Home,
+    // },
+    { title: "Search", url: "/search", icon: Search },
+  ]
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
         <div className="text-lg font-bold ml-2">Fowler Inc.</div>
         {/* <TeamSwitcher teams={data.teams} /> */}
-        {/* <NavMain items={data.navMain} /> */}
+        <NavMain items={navItems} />
       </SidebarHeader>
       <SidebarContent>
         <NavConversations channels={channels} dms={dms} />

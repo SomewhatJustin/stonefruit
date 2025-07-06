@@ -36,7 +36,7 @@ export default function ChatWindow({
             currentUserId={currentUserId}
           />
         </div>
-        <div className="absolute inset-x-0 bottom-0 bg-background z-10 px-4">
+        <div className="sticky inset-x-0 bottom-0 bg-background z-10 px-3 pb-4">
           <div>
             {typingUser && (
               <div className="text-xs text-muted-foreground mb-1">
