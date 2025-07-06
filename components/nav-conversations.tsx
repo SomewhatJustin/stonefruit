@@ -1,6 +1,6 @@
 "use client"
 
-import { CirclePlus } from "lucide-react"
+import { CirclePlus, Hash } from "lucide-react"
 
 import {
   SidebarGroup,
@@ -134,7 +134,12 @@ export function NavConversations({
           {localChannels.map(channel => (
             <SidebarMenuItem key={channel.id}>
               <SidebarMenuButton asChild>
-                <a href={`/channels/${channel.id}`} title={channel.name}>
+                <a
+                  href={`/channels/${channel.id}`}
+                  title={channel.name}
+                  className="flex items-center"
+                >
+                  <Hash className="size-4 mr-0 text-muted-foreground" />
                   <span>{channel.name}</span>
                 </a>
               </SidebarMenuButton>
