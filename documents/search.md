@@ -79,7 +79,3 @@ Implement an application-wide search that helps users quickly locate messages ac
 2. Build `<SearchModal />` component with debounced input & results list.
 3. Wire sidebar link to open modal (likely via global store or context).
 4. Add deep-linking to a specific message inside channel view.
-
----
-
-**Version**: 0.1 – Initial draft

@@ -17,10 +17,14 @@ export default function MessageList({
   return (
     <>
       {messages.length > 0 ? (
-        <ul className="my-16 list-inside text-sm space-y-2">
+        <ul className="my-2 list-inside text-sm space-y-2">
           {isLoading && <div>Loading…</div>}
           {messages.map(m => (
-            <li key={m.id} className="flex items-start gap-2">
+            <li
+              key={m.id}
+              id={`msg-${m.id}`}
+              className="flex items-start gap-2"
+            >
               <img
                 src={m.sender?.image ?? "/avatars/default.png"}
                 alt={m.sender?.email ?? "avatar"}
@@ -42,6 +46,10 @@ export default function MessageList({
             </li>
           ))}
         </ul>
+      ) : isLoading ? (
+        <div className="flex flex-1 items-center justify-center text-center text-sm text-muted-foreground">
+          Loading…
+        </div>
       ) : (
         <div className="flex flex-1 items-center justify-center text-center text-sm text-muted-foreground">
           No messages yet

@@ -4,6 +4,7 @@ import type { inferRouterOutputs } from "@trpc/server"
 import type { AppRouter } from "@/trpc"
 import MessageList from "./MessageList"
 import MessageInput from "./MessageInput"
+import { useEffect } from "react"
 
 // Infer message shape from tRPC output
 type RouterOutputs = inferRouterOutputs<AppRouter>
@@ -26,6 +27,18 @@ export default function ChatWindow({
   typingUser,
   currentUserId,
 }: ChatWindowProps) {
+  // Scroll to deep-linked message once messages load
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const hash = window.location.hash
+    if (hash.startsWith("#msg-")) {
+      const el = document.getElementById(hash.substring(1))
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    }
+  }, [messages])
+
   return (
     <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end relative">
       <div className="flex flex-col flex-1 justify-end">

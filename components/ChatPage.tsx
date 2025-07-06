@@ -59,10 +59,10 @@ export default async function ChatPage(props: ChatPageProps) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage className="line-clamp-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ">
                 {`#${currentChannel?.name ?? props.id}`}
                 {currentChannel?.description && (
-                  <span className="text-sm text-muted-foreground ml-2">
+                  <span className="hidden md:inline text-sm text-muted-foreground ml-2 line-clamp-1">
                     {currentChannel.description}
                   </span>
                 )}

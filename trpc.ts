@@ -368,6 +368,75 @@ export const appRouter = router({
       })
       return true
     }),
+
+  searchMessages: protectedProcedure
+    .input(z.object({ query: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const { session } = ctx
+      const userId = session!.user!.id as string
+
+      // Fetch up to 20 recent messages that contain the query (case-insensitive)
+      // and belong to channels where the current user is a member.
+      const messages = await prisma.message.findMany({
+        where: {
+          content: {
+            contains: input.query,
+            mode: "insensitive",
+          },
+          channel: {
+            members: {
+              some: { userId },
+            },
+          },
+        },
+        include: {
+          channel: {
+            select: {
+              id: true,
+              name: true,
+              isDirect: true,
+              members: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
+          },
+          sender: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+
+      // Map to lightweight result objects for UI consumption
+      return messages.map(m => {
+        // Determine DM partner user id when channel is direct
+        let dmUserId: string | null = null
+        if (m.channel.isDirect) {
+          const otherMember = m.channel.members.find(
+            mem => mem.userId !== userId
+          )
+          dmUserId = otherMember?.userId ?? null
+        }
+
+        return {
+          id: m.id,
+          channelId: m.channelId,
+          channelName: m.channel.name ?? "Direct Message",
+          isDirect: m.channel.isDirect,
+          dmUserId,
+          content: m.content,
+          createdAt: m.createdAt,
+        }
+      })
+    }),
 })
 
 export type AppRouter = typeof appRouter

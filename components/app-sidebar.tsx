@@ -25,32 +25,42 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import SearchModal from "@/components/SearchModal"
+import { useState } from "react"
 
 export function AppSidebar({
   channels,
   dms,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { channels: any[]; dms: any[] }) {
+  const [searchOpen, setSearchOpen] = useState(false)
   const navItems = [
     // {
     //   title: "Home",
     //   url: "/",
     //   icon: Home,
     // },
-    { title: "Search", url: "/search", icon: Search },
+    {
+      title: "Search",
+      icon: Search,
+      onClick: () => setSearchOpen(true),
+    },
   ]
   return (
-    <Sidebar className="border-r-0" {...props}>
-      <SidebarHeader>
-        <div className="text-lg font-bold ml-2">Fowler Inc.</div>
-        {/* <TeamSwitcher teams={data.teams} /> */}
-        <NavMain items={navItems} />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavConversations channels={channels} dms={dms} />
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
-      </SidebarContent>
-      <SidebarRail />
-    </Sidebar>
+    <>
+      <Sidebar className="border-r-0" {...props}>
+        <SidebarHeader>
+          <div className="text-lg font-bold ml-2">Fowler Inc.</div>
+          {/* <TeamSwitcher teams={data.teams} /> */}
+          <NavMain items={navItems} />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavConversations channels={channels} dms={dms} />
+          {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+    </>
   )
 }

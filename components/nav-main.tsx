@@ -13,21 +13,29 @@ export function NavMain({
 }: {
   items: {
     title: string
-    url: string
+    url?: string
     icon: LucideIcon
     isActive?: boolean
+    onClick?: () => void
   }[]
 }) {
   return (
     <SidebarMenu>
       {items.map(item => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild isActive={item.isActive}>
-            <a href={item.url}>
+          {item.onClick ? (
+            <SidebarMenuButton onClick={item.onClick} isActive={item.isActive}>
               <item.icon />
               <span>{item.title}</span>
-            </a>
-          </SidebarMenuButton>
+            </SidebarMenuButton>
+          ) : (
+            <SidebarMenuButton asChild isActive={item.isActive}>
+              <a href={item.url}>
+                <item.icon />
+                <span>{item.title}</span>
+              </a>
+            </SidebarMenuButton>
+          )}
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
