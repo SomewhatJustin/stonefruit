@@ -5,11 +5,18 @@ import path from "path"
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
+// Fix the type signature for the GET handler to match Next.js expectations
 export async function GET(
-  _req: Request,
-  { params }: { params: { path: string[] } }
+  req: Request,
+  context: { params: Promise<{ path?: string[] }> }
 ) {
-  const filePath = path.join(process.cwd(), "uploads", ...params.path)
+  const params = await context.params
+  const paramsPath = params?.path
+  if (!paramsPath || !Array.isArray(paramsPath) || paramsPath.length === 0) {
+    return new Response("Missing file path", { status: 400 })
+  }
+
+  const filePath = path.join(process.cwd(), "uploads", ...paramsPath)
 
   try {
     await stat(filePath) // ensure file exists
@@ -20,7 +27,6 @@ export async function GET(
   const stream = createReadStream(filePath)
   return new Response(stream as any, {
     headers: {
-      // Fallback MIME type – browsers will sniff if needed
       "Content-Type": "application/octet-stream",
     },
   })

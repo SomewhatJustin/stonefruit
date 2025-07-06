@@ -85,11 +85,16 @@ Streams the raw file from disk so it's served under the same domain (avoids CORS
 import { createReadStream } from "fs"
 import path from "path"
 
-export const GET = async (
-  _req: Request,
-  { params }: { params: { path: string[] } }
-) => {
-  const filePath = path.join(process.cwd(), "uploads", ...params.path)
+export async function GET(
+  req: Request,
+  context: { params?: { path?: string[] } }
+) {
+  const paramsPath = context.params?.path
+  if (!paramsPath || !Array.isArray(paramsPath) || paramsPath.length === 0) {
+    return new Response("Missing file path", { status: 400 })
+  }
+
+  const filePath = path.join(process.cwd(), "uploads", ...paramsPath)
   const stream = createReadStream(filePath)
   return new Response(stream as any, {
     headers: { "Content-Type": "application/octet-stream" },
