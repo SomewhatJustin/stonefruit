@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { trpc } from "@/lib/trpcClient"
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 
 export function NavConversations({
   channels,
@@ -34,6 +35,7 @@ export function NavConversations({
   dms: { id: string; name: string; email: string; image?: string }[]
 }) {
   const { isMobile } = useSidebar()
+  const pathname = usePathname()
 
   const [open, setOpen] = useState(false)
   const [localChannels, setLocalChannels] = useState(channels)
@@ -131,21 +133,24 @@ export function NavConversations({
           </Dialog>
         </div>
         <SidebarMenu>
-          {localChannels.map(channel => (
-            <SidebarMenuItem key={channel.id}>
-              <SidebarMenuButton asChild>
-                <a
-                  href={`/channels/${channel.id}`}
-                  title={channel.name}
-                  className="flex items-center"
-                >
-                  <Hash className="size-4 mr-0 text-muted-foreground" />
-                  <span>{channel.name}</span>
-                </a>
-              </SidebarMenuButton>
-              {/* Dropdown actions could go here, retained for potential future use. */}
-            </SidebarMenuItem>
-          ))}
+          {localChannels.map(channel => {
+            const isActive = pathname?.startsWith(`/channels/${channel.id}`)
+            return (
+              <SidebarMenuItem key={channel.id}>
+                <SidebarMenuButton asChild isActive={isActive}>
+                  <a
+                    href={`/channels/${channel.id}`}
+                    title={channel.name}
+                    className="flex items-center"
+                  >
+                    <Hash className="size-4 mr-0 text-muted-foreground" />
+                    <span>{channel.name}</span>
+                  </a>
+                </SidebarMenuButton>
+                {/* Dropdown actions could go here, retained for potential future use. */}
+              </SidebarMenuItem>
+            )
+          })}
           <SidebarMenuItem>{/* Spacer / future actions */}</SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
@@ -153,25 +158,28 @@ export function NavConversations({
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel>Direct Messages</SidebarGroupLabel>
         <SidebarMenu>
-          {dms.map(dm => (
-            <SidebarMenuItem key={dm.id}>
-              <SidebarMenuButton asChild>
-                <a
-                  href={`/dm/${dm.id}`}
-                  title={dm.email}
-                  className="flex items-center gap-2"
-                >
-                  <img
-                    src={dm.image ?? "/avatars/default.png"}
-                    alt={dm.email}
-                    className="w-5 h-5 rounded-full"
-                  />
-                  <span>{dm.email}</span>
-                </a>
-              </SidebarMenuButton>
-              {/* Dropdown actions could go here, retained for potential future use. */}
-            </SidebarMenuItem>
-          ))}
+          {dms.map(dm => {
+            const isActive = pathname?.startsWith(`/dm/${dm.id}`)
+            return (
+              <SidebarMenuItem key={dm.id}>
+                <SidebarMenuButton asChild isActive={isActive}>
+                  <a
+                    href={`/dm/${dm.id}`}
+                    title={dm.email}
+                    className="flex items-center gap-2"
+                  >
+                    <img
+                      src={dm.image ?? "/avatars/default.png"}
+                      alt={dm.email}
+                      className="w-5 h-5 rounded-full"
+                    />
+                    <span>{dm.email}</span>
+                  </a>
+                </SidebarMenuButton>
+                {/* Dropdown actions could go here, retained for potential future use. */}
+              </SidebarMenuItem>
+            )
+          })}
           <SidebarMenuItem>{/* Spacer / future actions */}</SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
