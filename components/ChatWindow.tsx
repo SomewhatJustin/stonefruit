@@ -17,6 +17,7 @@ interface ChatWindowProps {
   sendTyping: () => void
   typingUser: string | null
   currentUserId: string
+  onToggleReaction?: (messageId: string, emoji: string) => void
 }
 
 export default function ChatWindow({
@@ -26,6 +27,7 @@ export default function ChatWindow({
   sendTyping,
   typingUser,
   currentUserId,
+  onToggleReaction,
 }: ChatWindowProps) {
   // Scroll to deep-linked message once messages load
   useEffect(() => {
@@ -47,6 +49,7 @@ export default function ChatWindow({
             messages={messages}
             isLoading={isLoading}
             currentUserId={currentUserId}
+            onToggleReaction={onToggleReaction}
           />
         </div>
         <div className="sticky inset-x-0 bottom-0 bg-background z-10 px-3 pb-4">

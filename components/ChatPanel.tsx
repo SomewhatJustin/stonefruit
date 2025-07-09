@@ -20,8 +20,15 @@ export default function ChatPanel({
   context: ChatContext
   userId: string
 }) {
-  const { messages, isLoading, sendMessage, sendTyping, typingUser, error } =
-    useChat(context, userId)
+  const {
+    messages,
+    isLoading,
+    sendMessage,
+    sendTyping,
+    typingUser,
+    toggleReaction,
+    error,
+  } = useChat(context, userId)
   const router = useRouter()
 
   if (error?.data?.code === "FORBIDDEN") {
@@ -52,6 +59,7 @@ export default function ChatPanel({
       sendTyping={sendTyping}
       typingUser={typingUser}
       currentUserId={userId}
+      onToggleReaction={toggleReaction}
     />
   )
 }

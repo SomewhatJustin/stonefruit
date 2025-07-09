@@ -23,11 +23,16 @@ export function useChat(context: ChatContext, userId: string) {
   })
 
   const postMutation = trpc.postMessage.useMutation()
+  const reactionMutation = trpc.reactionToggle.useMutation()
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return
     // Attach current context so the backend knows where to post
     postMutation.mutate({ ...context, text })
+  }
+
+  const toggleReaction = (messageId: string, emoji: string) => {
+    reactionMutation.mutate({ messageId, emoji })
   }
 
   const [typingUser, setTypingUser] = useState<string | null>(null)
@@ -85,6 +90,25 @@ export function useChat(context: ChatContext, userId: string) {
           return
         }
 
+        if (data.type === "reaction") {
+          const relevant =
+            context.kind === "channel"
+              ? data.channelId === context.id
+              : messages.some(m => m.channelId === data.channelId)
+
+          if (relevant) {
+            utils.listMessages.setData(context, old => {
+              if (!old) return old
+              return old.map(msg =>
+                msg.id === data.messageId
+                  ? { ...msg, reactions: data.reactions }
+                  : msg
+              )
+            })
+          }
+          return
+        }
+
         let isRelevant = false
         if (context.kind === "channel") {
           isRelevant = data.channelId === context.id
@@ -124,5 +148,6 @@ export function useChat(context: ChatContext, userId: string) {
     sendMessage,
     sendTyping,
     typingUser,
+    toggleReaction,
   }
 }

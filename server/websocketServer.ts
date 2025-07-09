@@ -19,14 +19,17 @@ export function startWebSocketServer() {
     // push historical? maybe not.
     messageEvents.on("new", send)
     messageEvents.on("typing", send)
+    messageEvents.on("reaction", send)
 
     socket.on("close", () => {
       messageEvents.off("new", send)
       messageEvents.off("typing", send)
+      messageEvents.off("reaction", send)
     })
     socket.on("error", () => {
       messageEvents.off("new", send)
       messageEvents.off("typing", send)
+      messageEvents.off("reaction", send)
     })
   })
 }

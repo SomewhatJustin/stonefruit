@@ -146,7 +146,7 @@ export const appRouter = router({
           where: { channelId: channel.id },
           orderBy: { createdAt: "asc" },
           take: 100,
-          include: { sender: true },
+          include: { sender: true, reactions: true },
         })
         return msgs
       } else if (input.kind === "dm") {
@@ -160,7 +160,7 @@ export const appRouter = router({
           where: { channelId: channel.id },
           orderBy: { createdAt: "asc" },
           take: 100,
-          include: { sender: true },
+          include: { sender: true, reactions: true },
         })
         return msgs
       }
@@ -436,6 +436,73 @@ export const appRouter = router({
           createdAt: m.createdAt,
         }
       })
+    }),
+
+  reactionToggle: protectedProcedure
+    .input(z.object({ messageId: z.string(), emoji: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { session } = ctx
+      const userId = session!.user!.id as string
+      const { messageId, emoji } = input
+
+      // Check for existing reaction
+      const existing = await prisma.reaction.findUnique({
+        where: {
+          messageId_userId_emoji: {
+            messageId,
+            userId,
+            emoji,
+          },
+        },
+      })
+
+      if (existing) {
+        await prisma.reaction.delete({
+          where: {
+            messageId_userId_emoji: {
+              messageId,
+              userId,
+              emoji,
+            },
+          },
+        })
+      } else {
+        await prisma.reaction.create({
+          data: {
+            messageId,
+            userId,
+            emoji,
+          },
+        })
+      }
+
+      // Return aggregated counts for the message
+      const reactions = await prisma.reaction.findMany({
+        where: { messageId },
+        select: { emoji: true, userId: true },
+      })
+      // Group by emoji
+      const grouped: Record<string, { count: number; userIds: string[] }> = {}
+      for (const r of reactions) {
+        if (!grouped[r.emoji]) grouped[r.emoji] = { count: 0, userIds: [] }
+        grouped[r.emoji].count++
+        grouped[r.emoji].userIds.push(r.userId)
+      }
+
+      // Fetch channelId for this message
+      const msg = await prisma.message.findUnique({
+        where: { id: messageId },
+        select: { channelId: true },
+      })
+      if (msg) {
+        messageEvents.emit("reaction", {
+          type: "reaction",
+          channelId: msg.channelId,
+          messageId,
+          reactions: grouped,
+        })
+      }
+      return grouped
     }),
 })
 

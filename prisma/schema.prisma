@@ -35,6 +35,8 @@ model User {
 
   // Optional for WebAuthn support
   Authenticator Authenticator[]
+
+  reactions Reaction[]
 }
 
 model Account {
@@ -116,6 +118,8 @@ model Message {
 
   channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
   sender  User    @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  reactions Reaction[]
 }
 
 // Optional for WebAuthn support
@@ -132,4 +136,17 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+model Reaction {
+  messageId String
+  userId    String
+  emoji     String  // unicode, e.g. "👍" or custom:<id>
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([messageId, userId, emoji])       // each user → 1 reaction per emoji per message
+  @@index([messageId, emoji])            // fast aggregation
 }
