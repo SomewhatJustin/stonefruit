@@ -82,7 +82,7 @@ export default async function ChatPage(props: ChatPageProps) {
 
   return (
     <SidebarProvider>
-      <AppSidebar channels={channels} dms={dms} />
+      <AppSidebar channels={channels} dms={dms} user={session.user} />
       <SidebarInset className="min-h-screen">
         <header className="flex h-14 shrink-0 items-center gap-2 justify-between sticky top-0 w-full bg-background z-10">
           <div className="flex items-center gap-2 px-3">

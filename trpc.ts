@@ -504,6 +504,50 @@ export const appRouter = router({
       }
       return grouped
     }),
+
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        username: z.string().optional(),
+        image: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { session } = ctx
+      const userId = session!.user!.id as string
+
+      // Check if username is already taken (if provided)
+      if (input.username) {
+        const existing = await prisma.user.findUnique({
+          where: { username: input.username },
+        })
+        if (existing && existing.id !== userId) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Username is already taken",
+          })
+        }
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(input.name !== undefined && { name: input.name }),
+          ...(input.username !== undefined && { username: input.username }),
+          ...(input.image !== undefined && { image: input.image }),
+        },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          image: true,
+        },
+      })
+
+      return updatedUser
+    }),
 })
 
 export type AppRouter = typeof appRouter

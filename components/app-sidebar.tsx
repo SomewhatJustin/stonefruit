@@ -1,24 +1,12 @@
 "use client"
 
 import * as React from "react"
-import {
-  AudioWaveform,
-  Blocks,
-  Calendar,
-  Command,
-  Home,
-  Inbox,
-  MessageCircleQuestion,
-  Search,
-  Settings2,
-  Sparkles,
-  Trash2,
-} from "lucide-react"
+import { Search } from "lucide-react"
 
 import NavConversations from "@/components/nav-conversations"
 import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavUser } from "@/components/nav-user"
+
 import {
   Sidebar,
   SidebarContent,
@@ -31,8 +19,13 @@ import { useState } from "react"
 export function AppSidebar({
   channels,
   dms,
+  user,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { channels: any[]; dms: any[] }) {
+}: React.ComponentProps<typeof Sidebar> & {
+  channels: any[]
+  dms: any[]
+  user: { name?: string | null; email?: string | null; image?: string | null }
+}) {
   const [searchOpen, setSearchOpen] = useState(false)
   const navItems = [
     // {
@@ -56,6 +49,7 @@ export function AppSidebar({
         </SidebarHeader>
         <SidebarContent>
           <NavConversations channels={channels} dms={dms} />
+          <NavUser user={user} />
           {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
         </SidebarContent>
         <SidebarRail />
