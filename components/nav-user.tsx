@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { trpc } from "@/lib/trpcClient"
 import { toast } from "sonner"
+import Cropper from "react-easy-crop"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,6 +60,13 @@ export function NavUser({
   const [username, setUsername] = useState(user.username || "")
   const [isUploading, setIsUploading] = useState(false)
 
+  // Cropping state
+  const [cropModalOpen, setCropModalOpen] = useState(false)
+  const [imageToCrop, setImageToCrop] = useState<string>("")
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+
   // tRPC mutations
   const utils = trpc.useUtils()
   const updateProfile = trpc.updateProfile.useMutation({
@@ -71,6 +79,54 @@ export function NavUser({
       toast.error(error.message || "Failed to update profile")
     },
   })
+
+  const onCropComplete = useCallback(
+    (croppedArea: any, croppedAreaPixels: any) => {
+      setCroppedAreaPixels(croppedAreaPixels)
+    },
+    []
+  )
+
+  // Helper function to create cropped image
+  const createCroppedImage = useCallback(
+    async (imageSrc: string, pixelCrop: any): Promise<Blob> => {
+      const image = new Image()
+      image.src = imageSrc
+
+      return new Promise(resolve => {
+        image.onload = () => {
+          const canvas = document.createElement("canvas")
+          const ctx = canvas.getContext("2d")!
+
+          // Set canvas size to square
+          const size = Math.min(pixelCrop.width, pixelCrop.height)
+          canvas.width = size
+          canvas.height = size
+
+          ctx.drawImage(
+            image,
+            pixelCrop.x,
+            pixelCrop.y,
+            pixelCrop.width,
+            pixelCrop.height,
+            0,
+            0,
+            size,
+            size
+          )
+
+          canvas.toBlob(
+            blob => {
+              resolve(blob!)
+            },
+            "image/jpeg",
+            0.8
+          )
+        }
+      })
+    },
+    []
+  )
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -110,10 +166,9 @@ export function NavUser({
       const imageUrl = data.urls?.[0]
 
       if (imageUrl) {
-        setProfileImage(imageUrl)
-        toast.success(
-          "Image uploaded! Click 'Save Changes' to update your profile."
-        )
+        // Open crop modal with the uploaded image
+        setImageToCrop(imageUrl)
+        setCropModalOpen(true)
       }
     } catch (error) {
       console.error("Upload error:", error)
@@ -124,6 +179,49 @@ export function NavUser({
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
+    }
+  }
+
+  const handleCropConfirm = async () => {
+    if (!croppedAreaPixels || !imageToCrop) return
+
+    try {
+      setIsUploading(true)
+
+      // Create cropped image blob
+      const croppedImageBlob = await createCroppedImage(
+        imageToCrop,
+        croppedAreaPixels
+      )
+
+      // Upload the cropped image
+      const formData = new FormData()
+      formData.append("file", croppedImageBlob, "cropped-profile.jpg")
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Upload failed")
+      }
+
+      const data = await response.json()
+      const croppedImageUrl = data.urls?.[0]
+
+      if (croppedImageUrl) {
+        setProfileImage(croppedImageUrl)
+        setCropModalOpen(false)
+        toast.success(
+          "Image cropped! Click 'Save Changes' to update your profile."
+        )
+      }
+    } catch (error) {
+      console.error("Crop upload error:", error)
+      toast.error("Failed to process cropped image")
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -298,6 +396,55 @@ export function NavUser({
               disabled={updateProfile.isPending}
             >
               {updateProfile.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Crop Modal */}
+      <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Crop Profile Picture</DialogTitle>
+            <DialogDescription>
+              Adjust the crop area to create a square profile picture.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative h-96 w-full">
+            {imageToCrop && (
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="zoom">Zoom:</Label>
+            <input
+              id="zoom"
+              type="range"
+              min={1}
+              max={3}
+              step={0.1}
+              value={zoom}
+              onChange={e => setZoom(Number(e.target.value))}
+              className="flex-1"
+            />
+          </div>
+          <div className="flex justify-end space-x-2 pt-4">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              onClick={handleCropConfirm}
+              disabled={isUploading || !croppedAreaPixels}
+            >
+              {isUploading ? "Processing..." : "Confirm Crop"}
             </Button>
           </div>
         </DialogContent>
