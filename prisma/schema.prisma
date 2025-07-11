@@ -37,6 +37,7 @@ model User {
   Authenticator Authenticator[]
 
   reactions Reaction[]
+  channelReads ChannelRead[]
 }
 
 model Account {
@@ -90,6 +91,7 @@ model Channel {
   creator  User            @relation(fields: [creatorId], references: [id])
   members  ChannelMember[]
   messages Message[]
+  channelReads ChannelRead[]
 
   // For fast look-ups of "DM between A & B" we hash the member ids
   directHash String? @unique
@@ -149,4 +151,15 @@ model Reaction {
 
   @@id([messageId, userId, emoji])       // each user → 1 reaction per emoji per message
   @@index([messageId, emoji])            // fast aggregation
+}
+
+model ChannelRead {
+  channelId String
+  userId    String
+  lastRead  DateTime @default(now())
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([channelId, userId])
 }

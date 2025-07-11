@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { useEffect, useRef } from "react"
 
 export default function ChatPanel({
   context,
@@ -27,9 +28,34 @@ export default function ChatPanel({
     sendTyping,
     typingUser,
     toggleReaction,
+    markRead,
     error,
   } = useChat(context, userId)
   const router = useRouter()
+  const hasMarkedRead = useRef(false)
+
+  // Mark channel as read when loading finishes
+  useEffect(() => {
+    if (!isLoading && !hasMarkedRead.current) {
+      if (context.kind === "channel") {
+        // For channels, we have the channelId directly
+        markRead(context.id)
+        hasMarkedRead.current = true
+      } else if (messages.length > 0) {
+        // For DMs, get channelId from the first message
+        const channelId = messages[0]?.channelId
+        if (channelId) {
+          markRead(channelId)
+          hasMarkedRead.current = true
+        }
+      }
+    }
+  }, [isLoading, context.kind, context.id, markRead, messages])
+
+  // Reset the hasMarkedRead flag when context changes
+  useEffect(() => {
+    hasMarkedRead.current = false
+  }, [context.id, context.kind])
 
   if (error?.data?.code === "FORBIDDEN") {
     return (

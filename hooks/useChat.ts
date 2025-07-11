@@ -2,12 +2,16 @@
 
 import { useEffect, useState, useRef } from "react"
 import { trpc } from "@/lib/trpcClient"
+import { useUnread } from "@/hooks/useUnread"
 
 export type ChatContext = { kind: "channel" | "dm"; id: string }
 
 export function useChat(context: ChatContext, userId: string) {
   // React-Query utilities for cache updates
   const utils = trpc.useUtils()
+
+  // Use centralized unread management
+  const { markRead } = useUnread(userId)
 
   const {
     data: messages = [],
@@ -149,5 +153,6 @@ export function useChat(context: ChatContext, userId: string) {
     sendTyping,
     typingUser,
     toggleReaction,
+    markRead,
   }
 }

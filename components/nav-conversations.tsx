@@ -26,13 +26,23 @@ import { Input } from "@/components/ui/input"
 import { trpc } from "@/lib/trpcClient"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useUnread } from "@/hooks/useUnread"
 
 export function NavConversations({
   channels,
   dms,
+  userId,
 }: {
   channels: { id: string; name: string }[]
-  dms: { id: string; name: string; email: string; image?: string }[]
+  dms: {
+    id: string
+    name: string | null
+    email: string
+    image?: string | null
+    channelId?: string | null
+  }[]
+  userId?: string
 }) {
   const { isMobile } = useSidebar()
   const pathname = usePathname()
@@ -42,6 +52,9 @@ export function NavConversations({
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [error, setError] = useState<string | null>(null)
+
+  // Use the centralized unread hook
+  const { unreadSet } = useUnread(userId)
 
   const createChannel = trpc.createChannel.useMutation({
     onSuccess: newChannel => {
@@ -135,17 +148,24 @@ export function NavConversations({
         <SidebarMenu>
           {localChannels.map(channel => {
             const isActive = pathname?.startsWith(`/channels/${channel.id}`)
+            const isUnread = unreadSet.has(channel.id)
             return (
               <SidebarMenuItem key={channel.id}>
                 <SidebarMenuButton asChild isActive={isActive}>
-                  <a
+                  <Link
                     href={`/channels/${channel.id}`}
                     title={channel.name}
                     className="flex items-center"
                   >
                     <Hash className="size-4 mr-0 text-muted-foreground" />
                     <span>{channel.name}</span>
-                  </a>
+                    {isUnread && (
+                      <span
+                        className="ml-auto h-2 w-2 rounded-full bg-primary"
+                        aria-label="unread"
+                      />
+                    )}
+                  </Link>
                 </SidebarMenuButton>
                 {/* Dropdown actions could go here, retained for potential future use. */}
               </SidebarMenuItem>
@@ -160,10 +180,12 @@ export function NavConversations({
         <SidebarMenu>
           {dms.map(dm => {
             const isActive = pathname?.startsWith(`/dm/${dm.id}`)
+            // Check if this DM has unread messages using the channelId from server
+            const isUnread = dm.channelId ? unreadSet.has(dm.channelId) : false
             return (
               <SidebarMenuItem key={dm.id}>
                 <SidebarMenuButton asChild isActive={isActive}>
-                  <a
+                  <Link
                     href={`/dm/${dm.id}`}
                     title={dm.email}
                     className="flex items-center gap-2"
@@ -173,8 +195,14 @@ export function NavConversations({
                       alt={dm.email}
                       className="w-5 h-5 rounded-full"
                     />
-                    <span>{dm.email}</span>
-                  </a>
+                    <span>{dm.name ?? dm.email}</span>
+                    {isUnread && (
+                      <span
+                        className="ml-auto h-2 w-2 rounded-full bg-primary"
+                        aria-label="unread"
+                      />
+                    )}
+                  </Link>
                 </SidebarMenuButton>
                 {/* Dropdown actions could go here, retained for potential future use. */}
               </SidebarMenuItem>

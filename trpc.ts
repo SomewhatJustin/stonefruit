@@ -187,7 +187,9 @@ export const appRouter = router({
   listDirectMessages: protectedProcedure.query(async ({ ctx }) => {
     const { session } = ctx
     const userId = session!.user!.id as string
-    const directMessages = await prisma.user.findMany({
+
+    // Get all users except current user
+    const users = await prisma.user.findMany({
       where: {
         id: {
           not: userId,
@@ -201,6 +203,30 @@ export const appRouter = router({
         image: true,
       },
     })
+
+    // For each user, find or create the DM channel and include the channelId
+    const directMessages = await Promise.all(
+      users.map(async user => {
+        const directHash = [userId, user.id].sort().join(":")
+
+        // Try to find existing DM channel
+        let channel = await prisma.channel.findUnique({
+          where: { directHash },
+          select: { id: true },
+        })
+
+        // If no channel exists, we'll return null channelId (channel will be created when first message is sent)
+        return {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          image: user.image,
+          channelId: channel?.id || null,
+        }
+      })
+    )
+
     return directMessages
   }),
 
@@ -548,6 +574,53 @@ export const appRouter = router({
 
       return updatedUser
     }),
+
+  read: router({
+    mark: protectedProcedure
+      .input(z.object({ channelId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { session } = ctx
+        const userId = session!.user!.id as string
+
+        await prisma.channelRead.upsert({
+          where: {
+            channelId_userId: {
+              channelId: input.channelId,
+              userId: userId,
+            },
+          },
+          update: {
+            lastRead: new Date(),
+          },
+          create: {
+            channelId: input.channelId,
+            userId: userId,
+            lastRead: new Date(),
+          },
+        })
+
+        return true
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const { session } = ctx
+      const userId = session!.user!.id as string
+
+      // More efficient query: find all channels with unread messages in one go
+      const unreadChannels = await prisma.$queryRaw<{ channelId: string }[]>`
+        SELECT DISTINCT c.id as "channelId"
+        FROM "Channel" c
+        INNER JOIN "ChannelMember" cm ON cm."channelId" = c.id
+        INNER JOIN "Message" m ON m."channelId" = c.id
+        LEFT JOIN "ChannelRead" cr ON cr."channelId" = c.id AND cr."userId" = ${userId}
+        WHERE cm."userId" = ${userId}
+          AND m."senderId" != ${userId}
+          AND m."createdAt" > COALESCE(cr."lastRead", '1970-01-01'::timestamp)
+      `
+
+      return unreadChannels.map(row => row.channelId)
+    }),
+  }),
 })
 
 export type AppRouter = typeof appRouter

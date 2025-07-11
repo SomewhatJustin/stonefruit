@@ -34,7 +34,13 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   channels: any[]
-  dms: any[]
+  dms: {
+    id: string
+    name: string | null
+    email: string
+    image?: string | null
+    channelId?: string | null
+  }[]
   user: {
     name?: string | null
     email?: string | null
@@ -187,7 +193,7 @@ export function AppSidebar({
           <NavMain items={navItems} />
         </SidebarHeader>
         <SidebarContent>
-          <NavConversations channels={channels} dms={dms} />
+          <NavConversations channels={channels} dms={dms} userId={user.id} />
           <NavUser user={user} />
           {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
         </SidebarContent>
