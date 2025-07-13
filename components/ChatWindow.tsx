@@ -4,7 +4,7 @@ import type { inferRouterOutputs } from "@trpc/server"
 import type { AppRouter } from "@/trpc"
 import MessageList from "./MessageList"
 import MessageInput from "./MessageInput"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 // Infer message shape from tRPC output
 type RouterOutputs = inferRouterOutputs<AppRouter>
@@ -29,14 +29,22 @@ export default function ChatWindow({
   currentUserId,
   onToggleReaction,
 }: ChatWindowProps) {
-  // Scroll to deep-linked message once messages load
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to deep-linked message, or to the bottom.
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof window === "undefined") {
+      return
+    }
     const hash = window.location.hash
     if (hash.startsWith("#msg-")) {
       const el = document.getElementById(hash.substring(1))
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    } else {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "auto" })
       }
     }
   }, [messages])
@@ -51,6 +59,7 @@ export default function ChatWindow({
             currentUserId={currentUserId}
             onToggleReaction={onToggleReaction}
           />
+          <div ref={messagesEndRef} />
         </div>
         <div className="sticky inset-x-0 bottom-0 bg-background z-10 px-3 pb-4">
           <div>

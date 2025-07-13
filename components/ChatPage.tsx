@@ -1,7 +1,6 @@
 import * as React from "react"
 import { auth } from "@/auth"
 import { SignIn } from "@/components/SignIn"
-import { SignOut } from "@/components/SignOut"
 import ChatPanel from "@/components/ChatPanel"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -93,9 +92,6 @@ export default async function ChatPage(props: ChatPageProps) {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
             {headerContent}
-          </div>
-          <div className="px-3">
-            <SignOut />
           </div>
         </header>
         <main className="flex flex-col gap-8 px-3 pt-6 h-full">

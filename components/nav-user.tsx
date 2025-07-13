@@ -40,6 +40,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { signOutAction } from "@/lib/actions"
 
 export function NavUser({
   user,
@@ -300,17 +301,14 @@ export function NavUser({
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={e => {
+                e.preventDefault()
+                signOutAction()
+              }}
+            >
               <IconLogout />
               Log out
             </DropdownMenuItem>
