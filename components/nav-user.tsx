@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -66,6 +66,14 @@ export function NavUser({
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+
+  // Check if user profile is incomplete and auto-open dialog
+  useEffect(() => {
+    const isProfileIncomplete = !user.name // || !user.username
+    if (isProfileIncomplete) {
+      setAccountModalOpen(true)
+    }
+  }, [user.name]) // , user.username
 
   // tRPC mutations
   const utils = trpc.useUtils()
@@ -228,7 +236,7 @@ export function NavUser({
   const handleSaveChanges = () => {
     updateProfile.mutate({
       name: fullName,
-      username: username,
+      username: username.trim() || undefined, // Send undefined if username is empty
       image: profileImage,
     })
   }
@@ -309,15 +317,34 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
 
-      <Dialog open={accountModalOpen} onOpenChange={setAccountModalOpen}>
+      <Dialog open={accountModalOpen} onOpenChange={(open) => {
+        // Prevent closing if profile is incomplete
+        const isProfileIncomplete = !user.name // || !user.username
+        if (!open && isProfileIncomplete) {
+          return // Don't allow closing
+        }
+        setAccountModalOpen(open)
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Account Settings</DialogTitle>
+            <DialogTitle>
+              {(!user.name) ? "Complete Your Profile" : "Account Settings"}
+            </DialogTitle>
             <DialogDescription>
-              Manage your account settings and preferences.
+              {(!user.name) 
+                ? "Please complete your profile to get started with Stonefruit."
+                : "Manage your account settings and preferences."
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
+            {/* Show required fields note for incomplete profiles */}
+            {(!user.name) && (
+              <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
+                <span className="text-red-500">*</span> Required fields
+              </div>
+            )}
+            
             {/* Profile Picture Section */}
             <div className="space-y-2">
               <Label htmlFor="profile-picture">Profile Picture</Label>
@@ -350,27 +377,33 @@ export function NavUser({
 
             {/* Full Name Section */}
             <div className="space-y-2">
-              <Label htmlFor="full-name">Full Name</Label>
+              <Label htmlFor="full-name">
+                Full Name {!user.name && <span className="text-red-500">*</span>}
+              </Label>
               <Input
                 id="full-name"
                 type="text"
                 placeholder="Enter your full name"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
+                className={!user.name && !fullName.trim() ? "border-red-300 focus:border-red-500" : ""}
               />
             </div>
 
-            {/* Username Section */}
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+            {/* Username Section - Commented out for now */}
+            {/* <div className="space-y-2">
+              <Label htmlFor="username">
+                Username {!user.username && <span className="text-red-500">*</span>}
+              </Label>
               <Input
                 id="username"
                 type="text"
                 placeholder="Enter your username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
+                className={!user.username && !username.trim() ? "border-red-300 focus:border-red-500" : ""}
               />
-            </div>
+            </div> */}
 
             {/* Email Section (Read-only for now) */}
             <div className="space-y-2">
@@ -388,14 +421,18 @@ export function NavUser({
             </div>
           </div>
           <div className="flex justify-end space-x-2 pt-4">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
+            {/* Only show cancel button if profile is complete */}
+            {(user.name) && (
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+            )}
             <Button
               onClick={handleSaveChanges}
-              disabled={updateProfile.isPending}
+              disabled={updateProfile.isPending || !fullName.trim()}
             >
-              {updateProfile.isPending ? "Saving..." : "Save Changes"}
+              {updateProfile.isPending ? "Saving..." : 
+               (!user.name) ? "Complete Profile" : "Save Changes"}
             </Button>
           </div>
         </DialogContent>
