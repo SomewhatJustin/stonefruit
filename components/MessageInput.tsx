@@ -108,7 +108,10 @@ export default function MessageInput({
           if (e.key === "Enter") handleSend()
         }}
       />
-      <Button onClick={handleSend} className="border px-2 py-1 rounded">
+      <Button 
+        onClick={handleSend} 
+        className="bg-gradient-to-br from-pink-400 via-pink-500 via-purple-500 via-indigo-500 to-indigo-400 hover:from-pink-500 hover:via-pink-600 hover:via-purple-600 hover:via-indigo-600 hover:to-indigo-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 hover:animate-none"
+      >
         Send
       </Button>
     </div>
