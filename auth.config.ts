@@ -1,4 +1,4 @@
-import Mailgun from "next-auth/providers/mailgun"
+import Resend from "next-auth/providers/resend"
 import type { NextAuthConfig } from "next-auth"
 
 // Avatar generation & DB helper
@@ -7,9 +7,9 @@ import { prisma } from "@/prisma/prisma"
 
 const authConfig = {
   providers: [
-    Mailgun({
-      apiKey: process.env.AUTH_MAILGUN_KEY,
-      from: "postmaster@sandboxeb2f07c0ca294a2ca596ce73976c2fbb.mailgun.org",
+    Resend({
+      apiKey: process.env.RESEND_API_KEY,
+      from: "noreply@stonefruit.justin.how", // Update to your verified domain on Resend
     }),
   ],
   trustHost: true,

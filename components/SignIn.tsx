@@ -5,8 +5,8 @@ export function SignIn() {
     <form
       action={async (formData: FormData) => {
         "use server"
-        // Email provider id (matches auth.ts configuration)
-        await signIn("mailgun", formData)
+        // Email provider id (matches auth.config.ts configuration)
+        await signIn("resend", formData)
       }}
       className="flex flex-col gap-2"
     >

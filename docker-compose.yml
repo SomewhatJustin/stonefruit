@@ -18,7 +18,7 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       NEXTAUTH_SECRET: ${AUTH_SECRET}
-      AUTH_MAILGUN_KEY: ${AUTH_MAILGUN_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
       NEXT_DISABLE_ESLINT: "true"
     ports:
       - "3000:3000"
