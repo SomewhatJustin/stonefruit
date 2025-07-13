@@ -353,7 +353,15 @@ export const appRouter = router({
             senderId: userId,
             content: input.text,
           },
-          include: { sender: true },
+          // Include whether the channel is a direct message so the client can distinguish
+          include: {
+            sender: true,
+            channel: {
+              select: {
+                isDirect: true,
+              },
+            },
+          },
         })
       } else {
         // Direct message branch – input.id is the other participant's user id
@@ -365,7 +373,14 @@ export const appRouter = router({
             channelId: channel.id,
             content: input.text,
           },
-          include: { sender: true },
+          include: {
+            sender: true,
+            channel: {
+              select: {
+                isDirect: true,
+              },
+            },
+          },
         })
       }
 

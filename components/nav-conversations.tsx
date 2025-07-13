@@ -54,7 +54,7 @@ export function NavConversations({
   const [error, setError] = useState<string | null>(null)
 
   // Use the centralized unread hook
-  const { unreadSet } = useUnread(userId)
+  const { unreadSet, unreadDmUsers } = useUnread(userId)
 
   const createChannel = trpc.createChannel.useMutation({
     onSuccess: newChannel => {
@@ -100,7 +100,7 @@ export function NavConversations({
                   >
                     <Hash className="size-4 mr-0 text-muted-foreground" />
                     <span>{channel.name}</span>
-                    {isUnread && (
+                    {isUnread && !isActive && (
                       <span
                         className="ml-auto h-2 w-2 rounded-full bg-primary"
                         aria-label="unread"
@@ -180,7 +180,9 @@ export function NavConversations({
           {dms.map(dm => {
             const isActive = pathname?.startsWith(`/dm/${dm.id}`)
             // Check if this DM has unread messages using the channelId from server
-            const isUnread = dm.channelId ? unreadSet.has(dm.channelId) : false
+            const isUnread = dm.channelId
+              ? unreadSet.has(dm.channelId)
+              : unreadDmUsers.has(dm.id)
             return (
               <SidebarMenuItem key={dm.id}>
                 <SidebarMenuButton asChild isActive={isActive}>
@@ -195,7 +197,7 @@ export function NavConversations({
                       className="w-5 h-5 rounded-full"
                     />
                     <span>{dm.name ?? dm.email}</span>
-                    {isUnread && (
+                    {isUnread && !isActive && (
                       <span
                         className="ml-auto h-2 w-2 rounded-full bg-primary"
                         aria-label="unread"
