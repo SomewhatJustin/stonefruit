@@ -1,6 +1,6 @@
 "use client"
 
-import { CirclePlus, Hash } from "lucide-react"
+import { Plus, Hash } from "lucide-react"
 
 import {
   SidebarGroup,
@@ -85,66 +85,7 @@ export function NavConversations({
   return (
     <>
       <SidebarGroup className="group-data-[collapsible=icon]:hidden ">
-        <div className="flex items-center justify-between">
-          <SidebarGroupLabel>Channels</SidebarGroupLabel>
-
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="size-8">
-                <CirclePlus />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>New channel</DialogTitle>
-                <DialogDescription>
-                  Give your channel a name and description.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="grid gap-4">
-                <div className="grid gap-3">
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Name
-                  </label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <label htmlFor="description" className="text-sm font-medium">
-                    Description
-                  </label>
-                  <Input
-                    id="description"
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                  />
-                </div>
-                {error && (
-                  <div className="text-destructive text-sm">{error}</div>
-                )}
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline" type="button">
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    type="submit"
-                    disabled={createChannel.status === "pending"}
-                  >
-                    {createChannel.status === "pending"
-                      ? "Creating…"
-                      : "Create"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <SidebarGroupLabel>Channels</SidebarGroupLabel>
         <SidebarMenu>
           {localChannels.map(channel => {
             const isActive = pathname?.startsWith(`/channels/${channel.id}`)
@@ -171,7 +112,65 @@ export function NavConversations({
               </SidebarMenuItem>
             )
           })}
-          <SidebarMenuItem>{/* Spacer / future actions */}</SidebarMenuItem>
+          <SidebarMenuItem>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <SidebarMenuButton className="border border-dashed border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-muted-foreground/50">
+                  <Plus className="size-4 mr-0" />
+                  <span>Add Channel</span>
+                </SidebarMenuButton>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>New channel</DialogTitle>
+                  <DialogDescription>
+                    Give your channel a name and description.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="grid gap-4">
+                  <div className="grid gap-3">
+                    <label htmlFor="name" className="text-sm font-medium">
+                      Name
+                    </label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <label htmlFor="description" className="text-sm font-medium">
+                      Description
+                    </label>
+                    <Input
+                      id="description"
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                    />
+                  </div>
+                  {error && (
+                    <div className="text-destructive text-sm">{error}</div>
+                  )}
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline" type="button">
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      type="submit"
+                      disabled={createChannel.status === "pending"}
+                    >
+                      {createChannel.status === "pending"
+                        ? "Creating…"
+                        : "Create"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
 

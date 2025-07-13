@@ -182,7 +182,7 @@ export function AppSidebar({
             <Button
               variant="default"
               size="icon"
-              className="size-8 bg-blue-600 hover:bg-blue-700 text-white"
+              className="size-8 bg-orange-600 hover:bg-orange-700 text-white"
               onClick={() => setComposeOpen(true)}
               title="Compose (Ctrl+K)"
             >
