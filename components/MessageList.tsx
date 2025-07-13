@@ -6,6 +6,7 @@ import FileCard from "./FileCard"
 import { ReactionBar } from "./ReactionBar"
 import { SmilePlus } from "lucide-react"
 import EmojiPicker from "./EmojiPicker"
+import { getProfileDisplayName } from "@/lib/utils"
 
 interface MessageListProps {
   messages: ChatMessage[]
@@ -44,7 +45,7 @@ export default function MessageList({
             >
               <img
                 src={m.sender?.image ?? "/avatars/default.png"}
-                alt={m.sender?.email ?? "avatar"}
+                alt={m.sender ? getProfileDisplayName(m.sender) : "avatar"}
                 className="w-6 h-6 rounded-full flex-shrink-0"
               />
               <div className="flex-1">
@@ -52,7 +53,7 @@ export default function MessageList({
                   {new Date(m.createdAt).toLocaleTimeString()}
                 </span>
                 <span className="font-semibold mr-1">
-                  {m.sender?.email ?? "anon"}
+                  {m.sender ? getProfileDisplayName(m.sender) : "anon"}
                 </span>
                 {m.content.startsWith("/files/") ? (
                   <FileCard url={m.content} />
@@ -102,11 +103,7 @@ export default function MessageList({
                       const user = messages.find(
                         msg => msg.sender?.id === userId
                       )?.sender
-                      return (
-                        user?.name ||
-                        user?.email ||
-                        `User ${userId.slice(0, 8)}`
-                      )
+                      return user ? getProfileDisplayName(user) : `User ${userId.slice(0, 8)}`
                     }}
                   />
                 )}

@@ -10,6 +10,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
+import { getProfileDisplayName } from "@/lib/utils"
 
 export function NavMessages({
   dms,
@@ -30,15 +31,15 @@ export function NavMessages({
               <SidebarMenuButton asChild isActive={isActive}>
                 <a
                   href={`/dm/${dm.id}`}
-                  title={dm.email}
+                  title={getProfileDisplayName(dm)}
                   className="flex items-center gap-2"
                 >
                   <img
                     src={dm.image ?? "/avatars/default.png"}
-                    alt={dm.email}
+                    alt={getProfileDisplayName(dm)}
                     className="w-5 h-5 rounded-full"
                   />
-                  <span>{dm.email}</span>
+                  <span>{getProfileDisplayName(dm)}</span>
                 </a>
               </SidebarMenuButton>
               {/* <DropdownMenu>

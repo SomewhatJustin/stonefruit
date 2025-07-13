@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import SearchModal from "@/components/SearchModal"
 import { trpc } from "@/lib/trpcClient"
+import { getProfileDisplayName } from "@/lib/utils"
 
 export function AppSidebar({
   channels,
@@ -101,8 +102,8 @@ export function AppSidebar({
     ...filteredUserSuggestions.map(user => ({
       type: "user" as const,
       id: user.id,
-      name: user.name || user.email,
-      displayName: user.name || user.email,
+      name: getProfileDisplayName(user),
+      displayName: getProfileDisplayName(user),
       email: user.email,
       image: user.image,
     })),

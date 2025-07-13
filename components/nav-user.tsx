@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { trpc } from "@/lib/trpcClient"
 import { toast } from "sonner"
+import { getProfileDisplayName } from "@/lib/utils"
 import Cropper from "react-easy-crop"
 import {
   DropdownMenu,
@@ -259,7 +260,7 @@ export function NavUser({
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name || ""}</span>
+                <span className="truncate font-medium">{getProfileDisplayName(user)}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {user.email || ""}
                 </span>
@@ -285,7 +286,7 @@ export function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
-                    {user.name || ""}
+                    {getProfileDisplayName(user)}
                   </span>
                   <span className="text-muted-foreground truncate text-xs">
                     {user.email || ""}

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar"
 import { appRouter, createContext } from "@/trpc"
 import ManageMembersButton from "@/components/manage-members-button"
+import { getProfileDisplayName } from "@/lib/utils"
 
 // Shared chat page that works for both channels and direct messages.
 // Pass `variant` along with the corresponding identifier.
@@ -76,7 +77,7 @@ export default async function ChatPage(props: ChatPageProps) {
     chatContext = { kind: "channel", id: props.id }
   } else {
     const dmUser = dms.find(u => u.id === props.uid)
-    headerContent = <div className="text-sm">{dmUser?.email ?? props.uid}</div>
+    headerContent = <div className="text-sm">{dmUser ? getProfileDisplayName(dmUser) : props.uid}</div>
     chatContext = { kind: "dm", id: props.uid }
   }
 

@@ -28,6 +28,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useUnread } from "@/hooks/useUnread"
+import { getProfileDisplayName } from "@/lib/utils"
 
 export function NavConversations({
   channels,
@@ -188,15 +189,15 @@ export function NavConversations({
                 <SidebarMenuButton asChild isActive={isActive}>
                   <Link
                     href={`/dm/${dm.id}`}
-                    title={dm.email}
+                    title={getProfileDisplayName(dm)}
                     className="flex items-center gap-2"
                   >
                     <img
                       src={dm.image ?? "/avatars/default.png"}
-                      alt={dm.email}
+                      alt={getProfileDisplayName(dm)}
                       className="w-5 h-5 rounded-full"
                     />
-                    <span>{dm.name ?? dm.email}</span>
+                    <span>{getProfileDisplayName(dm)}</span>
                     {isUnread && !isActive && (
                       <span
                         className="ml-auto h-2 w-2 rounded-full bg-primary"

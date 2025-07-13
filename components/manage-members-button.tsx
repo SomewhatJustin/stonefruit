@@ -14,6 +14,7 @@ import {
 import { trpc } from "@/lib/trpcClient"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
+import { getProfileDisplayName } from "@/lib/utils"
 
 export default function ManageMembersButton({
   channelId,
@@ -87,10 +88,10 @@ export default function ManageMembersButton({
                 <div className="flex items-center gap-2">
                   <img
                     src={m.user.image ?? "/avatars/default.png"}
-                    alt={m.user.email}
+                    alt={getProfileDisplayName(m.user)}
                     className="w-6 h-6 rounded-full"
                   />
-                  <span>{m.user.email}</span>
+                  <span>{getProfileDisplayName(m.user)}</span>
                 </div>
                 <Button
                   variant="ghost"
@@ -126,10 +127,10 @@ export default function ManageMembersButton({
                   <div className="flex items-center gap-2">
                     <img
                       src={s.image ?? "/avatars/default.png"}
-                      alt={s.email}
+                      alt={getProfileDisplayName(s)}
                       className="w-5 h-5 rounded-full"
                     />
-                    <span>{s.email}</span>
+                    <span>{getProfileDisplayName(s)}</span>
                   </div>
                   <Plus className="size-4" />
                 </li>
