@@ -19,7 +19,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 RUN corepack enable
-RUN pnpm tsc scripts/regenAvatars.ts
+RUN node scripts/regenAvatars.ts
 
 
 # Copy built app and node_modules
