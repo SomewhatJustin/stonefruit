@@ -50,8 +50,11 @@ export const BACKGROUNDS: string[] = [
     "#cfd8dc", // cloudy grey-blue
   ];
 
-// Output directory (absolute path)
-const OUTPUT_DIR = path.resolve(process.cwd(), "public", "avatars", "generated")
+// Output directory (absolute path). We store generated avatars under the
+// persisted `uploads` directory so they survive container restarts and work
+// in read-only environments. They will be served via the existing
+// `/files/[...path]` route.
+const OUTPUT_DIR = path.resolve(process.cwd(), "uploads", "avatars")
 
 /**
  * Deterministically generates (or returns pre-existing) avatar for a given userId.
@@ -74,7 +77,7 @@ export async function generateAvatar(userId: string): Promise<string> {
   // If we've already generated it, short-circuit
   try {
     await fs.access(outputPath)
-    return `/avatars/generated/${outputFile}`
+    return `/files/avatars/${outputFile}`
   } catch (_) {
     /* continue — file does not exist */
   }
@@ -121,7 +124,7 @@ export async function generateAvatar(userId: string): Promise<string> {
     .png()
     .toFile(outputPath)
 
-  return `/avatars/generated/${outputFile}`
+  return `/files/avatars/${outputFile}`
 }
 
 // ---------- CLI helper ----------
