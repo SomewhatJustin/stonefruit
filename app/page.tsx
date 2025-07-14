@@ -10,10 +10,9 @@ export default async function Home() {
     return (
       <div className="flex flex-col min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-6">
+          <h1 className="text-5xl font-bold">Stonefruit</h1>
           <SignIn />
-          <div className="text-muted-foreground text-center">
-            Please sign in to use the chat demo.
-          </div>
+
         </div>
       </div>
     )
