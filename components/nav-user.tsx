@@ -254,11 +254,11 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.image || ""} alt={user.name || ""} />
-                <AvatarFallback className="rounded-lg">
+                {/* <AvatarFallback className="rounded-lg">
                   {user.name?.charAt(0).toUpperCase() ||
                     user.email?.charAt(0).toUpperCase() ||
                     "U"}
-                </AvatarFallback>
+                </AvatarFallback> */}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{getProfileDisplayName(user)}</span>
@@ -279,11 +279,11 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.image || ""} alt={user.name || ""} />
-                  <AvatarFallback className="rounded-lg">
+                  {/* <AvatarFallback className="rounded-lg">
                     {user.name?.charAt(0).toUpperCase() ||
                       user.email?.charAt(0).toUpperCase() ||
                       "U"}
-                  </AvatarFallback>
+                  </AvatarFallback> */}
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
@@ -350,11 +350,11 @@ export function NavUser({
               <div className="flex items-center space-x-4">
                 <Avatar className="h-16 w-16">
                   <AvatarImage src={profileImage} alt={fullName || "User"} />
-                  <AvatarFallback className="text-lg">
+                  {/* <AvatarFallback className="text-lg">
                     {fullName?.charAt(0).toUpperCase() ||
                       user.email?.charAt(0).toUpperCase() ||
                       "U"}
-                  </AvatarFallback>
+                  </AvatarFallback> */}
                 </Avatar>
                 <Button
                   variant="outline"
