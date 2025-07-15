@@ -184,6 +184,44 @@ export const appRouter = router({
     return channels
   }),
 
+  listAllChannels: protectedProcedure.query(async ({ ctx }) => {
+    const { session } = ctx
+    const userId = session!.user!.id as string
+    
+    // Get all public channels with member status for current user
+    const channels = await prisma.channel.findMany({
+      where: {
+        isDirect: false,
+      },
+      include: {
+        members: {
+          where: {
+            userId: userId,
+          },
+          select: {
+            userId: true,
+          },
+        },
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
+    
+    return channels.map(channel => ({
+      id: channel.id,
+      name: channel.name,
+      description: channel.description,
+      memberCount: channel._count.members,
+      isMember: channel.members.length > 0,
+    }))
+  }),
+
   listDirectMessages: protectedProcedure.query(async ({ ctx }) => {
     const { session } = ctx
     const userId = session!.user!.id as string
@@ -210,7 +248,7 @@ export const appRouter = router({
         const directHash = [userId, user.id].sort().join(":")
 
         // Try to find existing DM channel
-        let channel = await prisma.channel.findUnique({
+        const channel = await prisma.channel.findUnique({
           where: { directHash },
           select: { id: true },
         })
@@ -304,7 +342,7 @@ export const appRouter = router({
             },
           },
         })
-      } catch (err) {
+      } catch {
         // noop if not found
       }
       return true
