@@ -12,7 +12,6 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN corepack enable
 RUN pnpm prisma generate
 RUN pnpm build
-RUN pnpm tsx scripts/regenAvatars.ts
 
 # Production image, copy all the files and run next
 FROM node:22-alpine AS runner
@@ -29,6 +28,7 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/scripts ./scripts
 
 EXPOSE 3000
-CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm start"] 
+CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm tsx scripts/regenAvatars.ts && pnpm start"] 
