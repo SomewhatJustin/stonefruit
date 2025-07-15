@@ -1,5 +1,5 @@
-import { prisma } from "@/prisma/prisma"
-import { generateAvatar } from "@/scripts/generateAvatar"
+import { prisma } from "../prisma/prisma"
+import { generateAvatar } from "./generateAvatar"
 
 async function main() {
   const users = await prisma.user.findMany({})
