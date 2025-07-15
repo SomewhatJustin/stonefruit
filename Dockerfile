@@ -12,6 +12,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN corepack enable
 RUN pnpm prisma generate
 RUN pnpm build
+RUN pnpm tsx scripts/regenAvatars.ts
 
 # Production image, copy all the files and run next
 FROM node:22-alpine AS runner
