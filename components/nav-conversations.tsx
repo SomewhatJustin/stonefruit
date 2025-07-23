@@ -31,7 +31,7 @@ import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useUnread } from "@/hooks/useUnread"
-import { getProfileDisplayName } from "@/lib/utils"
+import { getProfileDisplayName, truncateName } from "@/lib/utils"
 
 export function NavConversations({
   channels,
@@ -149,7 +149,7 @@ export function NavConversations({
                     className="flex items-center"
                   >
                     <Hash className="size-4 mr-0 text-muted-foreground" />
-                    <span>{channel.name}</span>
+                    <span>{truncateName(channel.name)}</span>
                     {isUnread && !isActive && (
                       <span
                         className="ml-auto h-2 w-2 rounded-full bg-primary"
@@ -264,7 +264,7 @@ export function NavConversations({
                             <div className="flex items-center gap-3">
                               <Hash className="size-4 text-muted-foreground" />
                               <div className="flex flex-col">
-                                <span className="font-medium">{channel.name ?? "Unnamed Channel"}</span>
+                                <span className="font-medium">{truncateName(channel.name ?? "Unnamed Channel")}</span>
                                 {channel.description && (
                                   <span className="text-sm text-muted-foreground line-clamp-1">
                                     {channel.description}

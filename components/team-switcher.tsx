@@ -17,6 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { truncateName } from "@/lib/utils"
 
 export function TeamSwitcher({
   teams,
@@ -42,7 +43,7 @@ export function TeamSwitcher({
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-5 items-center justify-center rounded-md">
                 <activeTeam.logo className="size-3" />
               </div>
-              <span className="truncate font-medium">{activeTeam.name}</span>
+              <span className="truncate font-medium">{truncateName(activeTeam.name)}</span>
               <ChevronDown className="opacity-50" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -64,7 +65,7 @@ export function TeamSwitcher({
                 <div className="flex size-6 items-center justify-center rounded-xs border">
                   <team.logo className="size-4 shrink-0" />
                 </div>
-                {team.name}
+                {truncateName(team.name)}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}

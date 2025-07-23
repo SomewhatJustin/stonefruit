@@ -1,6 +1,7 @@
 "use client"
 
 import { Download } from "lucide-react"
+import { truncateName } from "@/lib/utils"
 
 export default function FileCard({ url }: { url: string }) {
   const filename = url.split("/").pop() ?? "file"
@@ -26,7 +27,7 @@ export default function FileCard({ url }: { url: string }) {
         />
       ) : null}
       <div className="flex items-center gap-2 text-xs break-all">
-        <span className="flex-1">{filename}</span>
+        <span className="flex-1">{truncateName(filename)}</span>
         <button onClick={handleDownload} className="hover:text-primary">
           <Download className="size-4" />
         </button>

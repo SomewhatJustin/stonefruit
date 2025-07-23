@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar"
 import { appRouter, createContext } from "@/trpc"
 import ManageMembersButton from "@/components/manage-members-button"
-import { getProfileDisplayName } from "@/lib/utils"
+import { getProfileDisplayName, truncateName } from "@/lib/utils"
 
 // Shared chat page that works for both channels and direct messages.
 // Pass `variant` along with the corresponding identifier.
@@ -60,7 +60,7 @@ export default async function ChatPage(props: ChatPageProps) {
           <BreadcrumbItem>
             <BreadcrumbPage className="line-clamp-1">
               <div className="flex items-center gap-2 ">
-                {`#${currentChannel?.name ?? props.id}`}
+                {`#${truncateName(currentChannel?.name ?? props.id)}`}
                 {currentChannel?.description && (
                   <span className="hidden md:inline text-sm text-muted-foreground ml-2 line-clamp-1">
                     {currentChannel.description}

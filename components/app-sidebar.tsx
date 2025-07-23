@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import SearchModal from "@/components/SearchModal"
 import { trpc } from "@/lib/trpcClient"
-import { getProfileDisplayName } from "@/lib/utils"
+import { getProfileDisplayName, truncateName } from "@/lib/utils"
 
 export function AppSidebar({
   channels,
@@ -97,7 +97,7 @@ export function AppSidebar({
       type: "channel" as const,
       id: channel.id,
       name: channel.name,
-      displayName: `${channel.name}`,
+      displayName: truncateName(channel.name),
     })),
     ...filteredUserSuggestions.map(user => ({
       type: "user" as const,

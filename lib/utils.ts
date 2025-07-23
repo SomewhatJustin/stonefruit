@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Truncates a name to a maximum of 30 characters
+ * @param name - The name to truncate
+ * @returns The truncated name with ellipsis if needed
+ */
+export function truncateName(name: string): string {
+  if (name.length <= 30) {
+    return name
+  }
+  return name.substring(0, 27) + "..."
+}
+
+/**
  * Determines the display name for a user profile based on available information.
  * Priority: name > username > email (email as fallback)
  * 
@@ -19,17 +31,17 @@ export function getProfileDisplayName(user: {
 }): string {
   // First priority: name
   if (user.name && user.name.trim()) {
-    return user.name.trim()
+    return truncateName(user.name.trim())
   }
   
   // Second priority: username
   if (user.username && user.username.trim()) {
-    return user.username.trim()
+    return truncateName(user.username.trim())
   }
   
   // Fallback: email
   if (user.email && user.email.trim()) {
-    return user.email.trim()
+    return truncateName(user.email.trim())
   }
   
   // Ultimate fallback if everything is null/empty
