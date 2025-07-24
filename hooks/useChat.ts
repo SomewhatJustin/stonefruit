@@ -49,7 +49,11 @@ export function useChat(context: ChatContext, userId: string) {
     const now = Date.now()
     if (now - lastTypingSentRef.current < 2000) return // throttle 2s
     lastTypingSentRef.current = now
-    typingMutation.mutate(context)
+    console.log("🔤 Sending typing indicator:", context)
+    typingMutation.mutate(context, {
+      onSuccess: () => console.log("✅ Typing mutation success"),
+      onError: (err) => console.error("❌ Typing mutation failed:", err)
+    })
   }
 
   // Attach WebSocket listener once on mount
@@ -83,8 +87,11 @@ export function useChat(context: ChatContext, userId: string) {
         const data = JSON.parse(e.data)
 
         if (data.type === "typing") {
+          console.log("📨 Received typing event:", data)
           const relevant = context.kind === data.kind && data.id === context.id
+          console.log("🎯 Typing relevant:", relevant, "not from self:", data.userId !== userId)
           if (relevant && data.userId !== userId) {
+            console.log("👤 Setting typing user:", data.name)
             setTypingUser(data.name ?? "Someone")
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             typingTimeoutRef.current = setTimeout(() => {

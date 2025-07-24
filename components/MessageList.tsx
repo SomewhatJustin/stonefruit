@@ -109,27 +109,31 @@ export default function MessageList({
                 )}
               </div>
               {currentUserId && (
-                <button
-                  ref={el => {
-                    if (el) triggerRefs.current[m.id] = el
-                  }}
-                  className="opacity-0 group-hover:opacity-100 absolute right-2 top-2 w-4 h-4 text-muted-foreground hover:text-foreground cursor-pointer transition-all duration-200"
-                  onClick={() =>
-                    setOpenPickerMessageId(
-                      openPickerMessageId === m.id ? null : m.id
-                    )
-                  }
-                >
-                  <SmilePlus className="w-4 h-4" />
-                </button>
-              )}
-              {openPickerMessageId === m.id && (
-                <EmojiPicker
-                  isOpen={true}
-                  onClose={() => setOpenPickerMessageId(null)}
-                  onEmojiSelect={emoji => handleEmojiSelect(m.id, emoji)}
-                  triggerRef={{ current: triggerRefs.current[m.id] }}
-                />
+                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div className="relative">
+                    <button
+                      ref={el => {
+                        if (el) triggerRefs.current[m.id] = el
+                      }}
+                      className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-pointer"
+                      onClick={() =>
+                        setOpenPickerMessageId(
+                          openPickerMessageId === m.id ? null : m.id
+                        )
+                      }
+                    >
+                      <SmilePlus className="w-4 h-4" />
+                    </button>
+                    {openPickerMessageId === m.id && (
+                      <EmojiPicker
+                        isOpen={true}
+                        onClose={() => setOpenPickerMessageId(null)}
+                        onEmojiSelect={emoji => handleEmojiSelect(m.id, emoji)}
+                        triggerRef={{ current: triggerRefs.current[m.id] }}
+                      />
+                    )}
+                  </div>
+                </div>
               )}
             </li>
           ))}

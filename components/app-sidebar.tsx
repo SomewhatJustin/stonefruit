@@ -34,7 +34,7 @@ export function AppSidebar({
   user,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  channels: any[]
+  channels: { id: string; name: string | null; description?: string | null }[]
   dms: {
     id: string
     name: string | null
@@ -83,7 +83,7 @@ export function AppSidebar({
 
   // Filter channels based on query
   const filteredChannels = channels.filter(channel =>
-    channel.name.toLowerCase().includes(query.toLowerCase())
+    channel.name?.toLowerCase().includes(query.toLowerCase())
   )
 
   // Filter out current user from user suggestions
@@ -97,7 +97,7 @@ export function AppSidebar({
       type: "channel" as const,
       id: channel.id,
       name: channel.name,
-      displayName: truncateName(channel.name),
+      displayName: truncateName(channel.name || ""),
     })),
     ...filteredUserSuggestions.map(user => ({
       type: "user" as const,

@@ -33,7 +33,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
@@ -57,7 +56,7 @@ export function NavUser({
   // Form state for editing
   const [profileImage, setProfileImage] = useState(user.image || "")
   const [fullName, setFullName] = useState(user.name || "")
-  const [username, setUsername] = useState(user.username || "")
+  const [username] = useState(user.username || "")
   const [isUploading, setIsUploading] = useState(false)
 
   // Cropping state
@@ -65,7 +64,7 @@ export function NavUser({
   const [imageToCrop, setImageToCrop] = useState<string>("")
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null)
 
   // Check if user profile is incomplete and auto-open dialog
   useEffect(() => {
@@ -76,7 +75,6 @@ export function NavUser({
   }, [user.name]) // , user.username
 
   // tRPC mutations
-  const utils = trpc.useUtils()
   const updateProfile = trpc.updateProfile.useMutation({
     onSuccess: () => {
       toast.success("Profile updated successfully!")
@@ -89,7 +87,7 @@ export function NavUser({
   })
 
   const onCropComplete = useCallback(
-    (croppedArea: any, croppedAreaPixels: any) => {
+    (croppedArea: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
       setCroppedAreaPixels(croppedAreaPixels)
     },
     []
@@ -97,7 +95,7 @@ export function NavUser({
 
   // Helper function to create cropped image
   const createCroppedImage = useCallback(
-    async (imageSrc: string, pixelCrop: any): Promise<Blob> => {
+    async (imageSrc: string, pixelCrop: { x: number; y: number; width: number; height: number }): Promise<Blob> => {
       const image = new Image()
       image.src = imageSrc
 

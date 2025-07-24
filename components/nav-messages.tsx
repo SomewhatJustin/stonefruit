@@ -4,10 +4,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
 import { getProfileDisplayName } from "@/lib/utils"
@@ -17,7 +15,6 @@ export function NavMessages({
 }: {
   dms: { id: string; name: string; email: string; image?: string }[]
 }) {
-  const { isMobile } = useSidebar()
   const pathname = usePathname()
 
   return (

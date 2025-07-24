@@ -38,7 +38,7 @@ export function NavConversations({
   dms,
   userId,
 }: {
-  channels: { id: string; name: string }[]
+  channels: { id: string; name: string | null }[]
   dms: {
     id: string
     name: string | null
@@ -145,11 +145,11 @@ export function NavConversations({
                 <SidebarMenuButton asChild isActive={isActive}>
                   <Link
                     href={`/channels/${channel.id}`}
-                    title={channel.name}
+                    title={channel.name || "Unnamed Channel"}
                     className="flex items-center"
                   >
                     <Hash className="size-4 mr-0 text-muted-foreground" />
-                    <span>{truncateName(channel.name)}</span>
+                    <span>{truncateName(channel.name || "Unnamed Channel")}</span>
                     {isUnread && !isActive && (
                       <span
                         className="ml-auto h-2 w-2 rounded-full bg-primary"

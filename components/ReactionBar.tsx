@@ -26,7 +26,7 @@ export function ReactionBar({
   onToggleReaction,
   getUserName = (userId: string) => `User ${userId.slice(0, 8)}`,
 }: ReactionBarProps) {
-  const [hoveredEmoji, setHoveredEmoji] = useState<string | null>(null)
+  const [, setHoveredEmoji] = useState<string | null>(null)
 
   if (!reactions || Object.keys(reactions).length === 0) {
     return null

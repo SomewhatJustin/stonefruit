@@ -77,6 +77,13 @@ export default function ChatPanel({
     )
   }
 
+  // Get channelId for ChatWindow
+  const channelId = context.kind === "channel" 
+    ? context.id 
+    : messages.length > 0 
+      ? messages[0]?.channelId 
+      : undefined
+
   return (
     <ChatWindow
       messages={messages}
@@ -86,6 +93,7 @@ export default function ChatPanel({
       typingUser={typingUser}
       currentUserId={userId}
       onToggleReaction={toggleReaction}
+      channelId={channelId}
     />
   )
 }

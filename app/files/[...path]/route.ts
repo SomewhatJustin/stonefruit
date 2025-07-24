@@ -25,7 +25,7 @@ export async function GET(
   }
 
   const stream = createReadStream(filePath)
-  return new Response(stream as any, {
+  return new Response(stream as unknown as ReadableStream, {
     headers: {
       "Content-Type": "application/octet-stream",
     },

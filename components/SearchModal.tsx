@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   Dialog,
@@ -61,7 +61,7 @@ export default function SearchModal({
     { enabled: debounced.length > 0 }
   )
 
-  const handleNavigate = (r: NonNullable<typeof results>[number]) => {
+  const handleNavigate = useCallback((r: NonNullable<typeof results>[number]) => {
     // Construct target url
     let url: string
     if (r.isDirect && r.dmUserId) {
@@ -71,7 +71,7 @@ export default function SearchModal({
     }
     router.push(url)
     onOpenChange(false)
-  }
+  }, [router, onOpenChange])
 
   // Memoize rendered list
   const renderedResults = useMemo(() => {
@@ -98,7 +98,7 @@ export default function SearchModal({
         ))}
       </ul>
     )
-  }, [results, query])
+  }, [results, query, handleNavigate])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

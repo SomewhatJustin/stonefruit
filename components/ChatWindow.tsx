@@ -5,6 +5,7 @@ import type { AppRouter } from "@/trpc"
 import MessageList from "./MessageList"
 import MessageInput from "./MessageInput"
 import { useEffect, useRef } from "react"
+import { trpc } from "@/lib/trpcClient"
 
 // Infer message shape from tRPC output
 type RouterOutputs = inferRouterOutputs<AppRouter>
@@ -18,6 +19,7 @@ interface ChatWindowProps {
   typingUser: string | null
   currentUserId: string
   onToggleReaction?: (messageId: string, emoji: string) => void
+  channelId?: string // Add channelId to fetch lastRead timestamp
 }
 
 export default function ChatWindow({
@@ -28,26 +30,52 @@ export default function ChatWindow({
   typingUser,
   currentUserId,
   onToggleReaction,
+  channelId,
 }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Fetch the user's last read timestamp for this channel
+  const { data: lastReadTimestamp } = trpc.read.getLastRead.useQuery(
+    { channelId: channelId || "" },
+    { enabled: !!channelId }
+  )
 
-  // Scroll to deep-linked message, or to the bottom.
+  // Scroll to deep-linked message, first unread message, or to the bottom.
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || isLoading || messages.length === 0) {
       return
     }
+
     const hash = window.location.hash
     if (hash.startsWith("#msg-")) {
+      // Priority 1: Deep-linked message
       const el = document.getElementById(hash.substring(1))
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" })
-      }
-    } else {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "auto" })
+        return
       }
     }
-  }, [messages])
+
+    // Priority 2: First unread message (if we have lastReadTimestamp)
+    if (lastReadTimestamp && channelId) {
+      const firstUnreadMessage = messages.find(
+        message => new Date(message.createdAt) > new Date(lastReadTimestamp)
+      )
+      
+      if (firstUnreadMessage) {
+        const unreadEl = document.getElementById(`msg-${firstUnreadMessage.id}`)
+        if (unreadEl) {
+          unreadEl.scrollIntoView({ behavior: "smooth", block: "start" })
+          return
+        }
+      }
+    }
+
+    // Priority 3: Scroll to bottom (default)
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" })
+    }
+  }, [messages, lastReadTimestamp, isLoading, channelId])
 
   return (
     <div className="flex flex-col gap-4 h-full min-h-[400px] flex-1 justify-end relative">

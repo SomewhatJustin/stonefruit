@@ -438,13 +438,15 @@ export const appRouter = router({
     .mutation(({ ctx, input }) => {
       const { session } = ctx
       const userId = session!.user!.id as string
-      messageEvents.emit("typing", {
+      const typingData = {
         type: "typing",
         userId,
         name: session!.user?.name ?? session!.user?.email ?? "Someone",
         kind: input.kind,
         id: input.id,
-      })
+      }
+      console.log("🚀 Server emitting typing event:", typingData)
+      messageEvents.emit("typing", typingData)
       return true
     }),
 
@@ -673,6 +675,24 @@ export const appRouter = router({
 
       return unreadChannels.map(row => row.channelId)
     }),
+
+    getLastRead: protectedProcedure
+      .input(z.object({ channelId: z.string() }))
+      .query(async ({ input, ctx }) => {
+        const { session } = ctx
+        const userId = session!.user!.id as string
+
+        const channelRead = await prisma.channelRead.findUnique({
+          where: {
+            channelId_userId: {
+              channelId: input.channelId,
+              userId: userId,
+            },
+          },
+        })
+
+        return channelRead?.lastRead || null
+      }),
   }),
 })
 

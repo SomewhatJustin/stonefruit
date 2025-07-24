@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import data from "@emoji-mart/data"
 import Picker from "@emoji-mart/react"
 
@@ -18,6 +18,32 @@ export default function EmojiPicker({
   triggerRef,
 }: EmojiPickerProps) {
   const pickerRef = useRef<HTMLDivElement>(null)
+  const [shouldOpenUpward, setShouldOpenUpward] = useState(false)
+
+  // Calculate positioning when picker opens
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return
+
+    const calculatePosition = () => {
+      if (!triggerRef.current) return
+
+      const triggerRect = triggerRef.current.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const pickerHeight = 350 // Approximate height of the emoji picker
+      
+      // Check if there's enough space below the trigger
+      const spaceBelow = viewportHeight - triggerRect.bottom
+      const shouldOpenUp = spaceBelow < pickerHeight && triggerRect.top > pickerHeight
+      
+      setShouldOpenUpward(shouldOpenUp)
+    }
+
+    calculatePosition()
+    
+    // Recalculate on window resize
+    window.addEventListener('resize', calculatePosition)
+    return () => window.removeEventListener('resize', calculatePosition)
+  }, [isOpen, triggerRef])
 
   useEffect(() => {
     if (!isOpen) return
@@ -53,11 +79,15 @@ export default function EmojiPicker({
   return (
     <div
       ref={pickerRef}
-      className="absolute z-50 top-full right-0 mt-1 shadow-lg rounded-lg border bg-background"
+      className={`absolute z-50 right-0 shadow-lg rounded-lg border bg-background ${
+        shouldOpenUpward 
+          ? "bottom-full mb-1" 
+          : "top-full mt-1"
+      }`}
     >
       <Picker
         data={data}
-        onEmojiSelect={(emoji: any) => {
+        onEmojiSelect={(emoji: { native: string }) => {
           onEmojiSelect(emoji.native)
           onClose()
         }}

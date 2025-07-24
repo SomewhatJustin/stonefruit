@@ -10,14 +10,14 @@ function isPrefetch(req: NextRequest) {
 
 /** Gmail/Chrome HEAD probe */
 export function HEAD(req: NextRequest) {
-  for (const [key, value] of req.headers.entries()) {
+  for (const [,] of req.headers.entries()) {
   }
   return new Response(null, { status: 200 })
 }
 
 /** Real log-in vs Google prefetch */
 export async function GET(req: NextRequest) {
-  for (const [key, value] of req.headers.entries()) {
+  for (const [,] of req.headers.entries()) {
   }
   if (isPrefetch(req)) {
     // let Gmail / Chrome see a 200 OK but keep the token intact
