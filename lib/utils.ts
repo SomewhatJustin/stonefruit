@@ -47,3 +47,32 @@ export function getProfileDisplayName(user: {
   // Ultimate fallback if everything is null/empty
   return "Unknown User"
 }
+
+/**
+ * Determines if a WebSocket event is relevant for the current chat context.
+ * Handles both channels and DMs, using channelId for DMs.
+ *
+ * @param context - The current chat context (channel or dm)
+ * @param data - The event data (should have kind, id, userId, etc.)
+ * @param userId - The current user's ID
+ * @param messages - The current message list (for DM channelId lookup)
+ */
+export function isEventRelevant(
+  context: { kind: "channel" | "dm"; id: string },
+  data: { kind: string; id: string; userId?: string },
+  userId: string,
+  messages: { channelId?: string; senderId?: string }[]
+): boolean {
+  if (context.kind === "channel") {
+    return data.kind === "channel" && data.id === context.id
+  } else if (context.kind === "dm") {
+    const currentChannelId = messages[0]?.channelId
+    if (currentChannelId) {
+      return data.kind === "dm" && data.id === currentChannelId
+    } else if (messages.length === 0) {
+      // Fallback for empty DMs: check if the sender or receiver matches
+      return data.kind === "dm" && (data.userId === userId || data.userId === context.id)
+    }
+  }
+  return false
+}
