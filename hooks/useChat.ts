@@ -89,6 +89,10 @@ export function useChat(context: ChatContext, userId: string) {
 
         if (data.type === "typing") {
           console.log("📨 Received typing event:", data)
+          console.log("Context:", context)
+          console.log("UserId:", userId)
+          console.log("Messages:", messages)
+          console.log("Event data:", data)
           const relevant = isEventRelevant(context, data, userId, messages)
           console.log("🎯 Typing relevant:", relevant, "not from self:", data.userId !== userId)
           if (relevant && data.userId !== userId) {

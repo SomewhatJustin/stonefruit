@@ -66,13 +66,8 @@ export function isEventRelevant(
   if (context.kind === "channel") {
     return data.kind === "channel" && data.id === context.id
   } else if (context.kind === "dm") {
-    const currentChannelId = messages[0]?.channelId
-    if (currentChannelId) {
-      return data.kind === "dm" && data.id === currentChannelId
-    } else if (messages.length === 0) {
-      // Fallback for empty DMs: check if the sender or receiver matches
-      return data.kind === "dm" && (data.userId === userId || data.userId === context.id)
-    }
+    // context.id is the other user's userId
+    return data.kind === "dm" && data.userId === context.id
   }
   return false
 }
