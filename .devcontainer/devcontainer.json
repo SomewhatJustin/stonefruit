@@ -8,7 +8,9 @@
   "runServices": ["db"],
   "overrideCommand": true,
   "remoteUser": "node",
-  "features": {},
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
   "forwardPorts": [3000, 3001, 5432],
   "portsAttributes": {
     "3000": { "label": "Next.js" },
@@ -18,6 +20,12 @@
   "containerEnv": {
     "DATABASE_URL": "postgres://postgres:postgres@db:5432/stonefruit",
     "NEXTAUTH_SECRET": "dev-secret"
+  },
+  "mounts": [
+    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+  ],
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent"
   },
   "postCreateCommand": "bash -lc 'sudo corepack enable || true; pnpm install'",
   "postStartCommand": "bash -lc 'pnpm prisma generate && pnpm prisma migrate deploy'",
