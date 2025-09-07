@@ -1,0 +1,33 @@
+{
+  "name": "stonefruit-dev",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/workspaces/stonefruit",
+  "runServices": ["db"],
+  "overrideCommand": true,
+  "remoteUser": "node",
+  "features": {},
+  "forwardPorts": [3000, 3001, 5432],
+  "portsAttributes": {
+    "3000": { "label": "Next.js" },
+    "3001": { "label": "WebSocket" },
+    "5432": { "label": "Postgres" }
+  },
+  "containerEnv": {
+    "DATABASE_URL": "postgres://postgres:postgres@db:5432/stonefruit",
+    "NEXTAUTH_SECRET": "dev-secret"
+  },
+  "postCreateCommand": "bash -lc 'sudo corepack enable || true; pnpm install'",
+  "postStartCommand": "bash -lc 'pnpm prisma generate && pnpm prisma migrate deploy'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "Prisma.prisma"
+      ]
+    }
+  }
+}

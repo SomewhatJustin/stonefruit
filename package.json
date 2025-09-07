@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"docker compose up -d db\" \"pnpm prisma dev\" \"next dev\"",
+    "dev:container": "concurrently \"pnpm prisma dev\" \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

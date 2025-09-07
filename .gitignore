@@ -47,3 +47,9 @@ public/avatars/generated
 
 # user uploads
 uploads/
+
+# pnpm local store (keep it outside the repo)
+.pnpm-store/
+
+# Editor settings
+.vscode/
