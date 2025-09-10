@@ -1,41 +1,19 @@
 {
-  "name": "stonefruit-dev",
-  "dockerComposeFile": [
-    "docker-compose.yml"
-  ],
-  "service": "dev",
-  "workspaceFolder": "/workspaces/stonefruit",
-  "runServices": ["db"],
-  "overrideCommand": true,
-  "remoteUser": "node",
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "forwardPorts": [3000, 3001, 5432],
-  "portsAttributes": {
-    "3000": { "label": "Next.js" },
-    "3001": { "label": "WebSocket" },
-    "5432": { "label": "Postgres" }
-  },
-  "containerEnv": {
-    "DATABASE_URL": "postgres://postgres:postgres@db:5432/stonefruit",
-    "NEXTAUTH_SECRET": "dev-secret"
-  },
-  "mounts": [
-    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
-  ],
-  "remoteEnv": {
-    "SSH_AUTH_SOCK": "/ssh-agent"
-  },
-  "postCreateCommand": "bash -lc 'sudo corepack enable || true; pnpm install'",
-  "postStartCommand": "bash -lc 'pnpm prisma generate && pnpm prisma migrate deploy'",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "Prisma.prisma"
-      ]
-    }
-  }
+"name": "stonefruit-dev",
+"dockerComposeFile": "../docker-compose.yml",
+"service": "dev",
+"workspaceFolder": "/work",
+"features": {},
+"customizations": {
+"vscode": {
+"settings": {"terminal.integrated.defaultProfile.linux": "bash"},
+"extensions": [
+"esbenp.prettier-vscode",
+"dbaeumer.vscode-eslint",
+"prisma.prisma",
+"bradlc.vscode-tailwindcss"
+]
+}
+},
+"postCreateCommand": "pnpm -v && node -v"
 }
