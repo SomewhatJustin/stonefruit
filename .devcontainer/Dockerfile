@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 # Tools: Node LTS, pnpm, git, curl, openssl
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update \
