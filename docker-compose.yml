@@ -20,5 +20,10 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  app:
+    build: .
+    command: pnpm start
+    volumes: ./:/work
+    ports: 3000:3000
 volumes:
   pgdata:
