@@ -1,15 +1,24 @@
 'use strict'
 
 import Fastify from 'fastify'
+import { PrismaClient } from './generated/prisma/index.js'
 
 const fastify = Fastify({
   logger: true
 })
 
+const prisma = new PrismaClient()
+
 
 // Declare a route
 fastify.get('/', function (request, reply) {
   reply.send({ hello: 'world' })
+
+})
+
+fastify.post('/', function (request, reply) {
+  const message = prisma.Message.create({ data: { content: request.body.content } })
+  return message
 })
 
 // Run the server!

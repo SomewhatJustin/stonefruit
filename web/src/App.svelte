@@ -9,9 +9,3 @@
   <h1 class="text-lg">Hey</h1>
   <MessageComposer />
 </main>
-
-<style>
-  .title {
-    font-size: 2rem;
-  }
-</style>
