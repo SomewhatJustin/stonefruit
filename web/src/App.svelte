@@ -5,8 +5,8 @@
   import MessageComposer from "./lib/MessageComposer.svelte";
 </script>
 
-<main>
-  <h1 class="title">Hey</h1>
+<main class="flex-column m-8">
+  <h1 class="text-lg">Hey</h1>
   <MessageComposer />
 </main>
 
