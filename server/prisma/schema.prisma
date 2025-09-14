@@ -14,7 +14,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Conversation {
+  id           String    @id @default(uuid())
+  kind         ConvoType
+  messages     Message[]
+  participants User[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
 model Message {
-  id      String @id @default(uuid())
-  content String
+  id             String        @id @default(uuid())
+  content        String
+  sender         User          @relation(fields: [userId], references: [id])
+  userId         String
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  conversationId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model User {
+  id            String         @id @default(uuid())
+  fName         String?
+  lName         String?
+  username      String?        @unique
+  email         String?        @unique
+  phone         String?        @unique
+  messages      Message[]
+  conversations Conversation[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum ConvoType {
+  DM
+  GROUP_DM
+  CHANNEL
 }
